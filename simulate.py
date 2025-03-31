@@ -121,9 +121,9 @@ class FlatTile(Tile):
     """Create a FlatTile that just gives the amount of resource
 
     Args:
-        points (int, optional): Number of points. Defaults to 0.
-        gems (int, optional): Number of gems. Defaults to 0.
-        dice (int, optional): Number of dice. Defaults to 0.
+      points (int, optional): Number of points. Defaults to 0.
+      gems (int, optional): Number of gems. Defaults to 0.
+      dice (int, optional): Number of dice. Defaults to 0.
     """
     self.points = points
     self.gems = gems
@@ -207,10 +207,10 @@ def calc_best_multipliers(board: list[Tile]):
   """Calculate the best multipliers for the board
 
   Args:
-      board (list[Tile]): The board
+    board (list[Tile]): The board
 
   Returns:
-      list[int]: The best multipliers to apply when rolling from each tile of the board
+    list[int]: The best multipliers to apply when rolling from each tile of the board
   """
   tile_values: list[tuple[float,float]] = [tile.get_value() for tile in board]
   
@@ -337,8 +337,8 @@ def output_stats(runs: list[SimResult], comparator: int):
   """Output the stats of all the runs
 
   Args:
-      runs (list[SimResult]): The simulation runs
-      comparator (int): Either 1 or 2. 1 = use number of points earned to determine min/max. 2 = use number of dice needed initially to determine min/max.
+    runs (list[SimResult]): The simulation runs
+    comparator (int): Either 1 or 2. 1 = use number of points earned to determine min/max. 2 = use number of dice needed initially to determine min/max.
   """
   num_rounds = len(runs)
   total_points = 0
@@ -440,12 +440,12 @@ def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_r
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
-      board (list[Tile]): The board
-      multipliers (list[int]): The multipliers to apply when rolling from each tile
-      num_dice_rolls (int): Number of dice to start with
+    board (list[Tile]): The board
+    multipliers (list[int]): The multipliers to apply when rolling from each tile
+    num_dice_rolls (int): Number of dice to start with
 
   Returns:
-      SimResult: Result of simulation
+    SimResult: Result of simulation
   """
   result = SimResult()
   current_position = 0
@@ -477,12 +477,12 @@ def simulate_meeting_points(board: list[Tile], multipliers: list[int], points_to
   """Simulate going around the board until we reach a points breakpoint
 
   Args:
-      board (list[Tile]): The board
-      multipliers (list[int]): The multipliers to apply when rolling from each tile
-      points_to_meet (int): Number of points to reach until we end the simulation
+    board (list[Tile]): The board
+    multipliers (list[int]): The multipliers to apply when rolling from each tile
+    points_to_meet (int): Number of points to reach until we end the simulation
 
   Returns:
-      SimResult: Result of simulation
+    SimResult: Result of simulation
   """
   result = SimResult()
   current_position = 0
@@ -505,11 +505,11 @@ def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rou
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
-      sim_details (list[SimulationDetails]): Different multipliers to run
-      board (list[Tile]): The board
-      num_rounds (int): The number of times to run simulation
-      num_dices (list[int]): List of the number of dice to start each simulation with
-      output_csv (bool): Whether we should output the runs in a CSV
+    sim_details (list[SimulationDetails]): Different multipliers to run
+    board (list[Tile]): The board
+    num_rounds (int): The number of times to run simulation
+    num_dices (list[int]): List of the number of dice to start each simulation with
+    output_csv (bool): Whether we should output the runs in a CSV
   """
   for sim in sim_details:
     runs = []
@@ -529,11 +529,11 @@ def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rou
   """Run simulations to get the average number of dice required initially to reach a specified point threshold. This does not take into account how many dice you actually have and will assume you can always apply the multiplier specified.
 
   Args:
-      sim_details (list[SimulationDetails]): Different multipliers to run
-      board (list[Tile]): The board
-      num_rounds (int): The number of times to run simulation
-      points_to_meet (int): Number of points to reach until we end the simulation
-      output_csv (bool): Whether we should output the runs in a CSV
+    sim_details (list[SimulationDetails]): Different multipliers to run
+    board (list[Tile]): The board
+    num_rounds (int): The number of times to run simulation
+    points_to_meet (int): Number of points to reach until we end the simulation
+    output_csv (bool): Whether we should output the runs in a CSV
   """
   for sim in sim_details:
     runs = []
