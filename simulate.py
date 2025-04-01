@@ -418,7 +418,7 @@ def output_stats(runs: list[SimResult], comparator: int):
 def output_csv(csv_file_name: str, runs: list[SimResult]):
   header = ['# of Points', '# of Dice Initially', 'Points per Initial Dice', '# of Rolls Done', 'Points per Roll', '# of Gems', '# of Chroma Keys', '# of Obsidian Keys', '# of Otta Shards', '# of Gold']
   with open(csv_file_name, 'w', newline='') as csvfile:
-      csvwriter = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+      csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
       csvwriter.writerow(header)
       for run in runs:
         row = [

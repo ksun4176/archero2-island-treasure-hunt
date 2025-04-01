@@ -46,5 +46,6 @@ simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rounds:
 We have a few multipliers already saved in `sims` so check them out in `simulate.py`.
 
 To create a new one, you can:
-1. Run `>>> new_sim_var = SimulationDetails({unique label/filename}, {multipliers (must be a list of 24 integers)})`
-2. Run `>>> simulate1([new_sim_var], board, 10_000, [500])`
+1. When making your list of multipliers, make sure the order matches up with what we have in `board`.
+2. Run `>>> new_sim_var = SimulationDetails({unique label/filename}, {multipliers (must be a list of 24 integers)})`.
+3. Run `>>> simulation1([new_sim_var], board, 10_000, [500])`.
