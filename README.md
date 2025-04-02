@@ -39,7 +39,7 @@ simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rounds:
 ## How to run
 1. In terminal, run `python -i simulate.py`
 2. You will see `>>>` which means you can now run the functions available in the script
-3. Example function usage: `>>> simulate1(sims, board, 10_000, [500])`
+3. Example function usage: `>>> simulation1(sims, board, 10_000, [500])`
    - This will run 10,000 rounds of `simulate_starting_dice` starting with 500 dice for each of the multipliers in `sims`
 
 ### Adding a new multiplier
