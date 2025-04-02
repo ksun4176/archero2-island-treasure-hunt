@@ -161,6 +161,14 @@ class GrandPrizeTile(Tile):
 class PointWheelTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
     spin = random.randint(1,10000)
+    points = 100
+    if (spin <= 3478):
+      points = 200
+    elif (spin <= 3478 + 2608):
+      points = 500
+    elif (spin <= 3478 + 2608 + 434):
+      points = 1000
+
     spin2 = random.randint(1,10000)
     spin_multiplier = 1
     if (spin2 <= 3076):
@@ -168,14 +176,7 @@ class PointWheelTile(Tile):
     elif (spin2 <= 3076 + 769):
       spin_multiplier = 5
 
-    if (spin <= 3478): # 100 points
-      result.add_points(100 * multiplier * spin_multiplier)
-    elif (spin <= 3478 + 3478): # 200 points
-      result.add_points(200 * multiplier * spin_multiplier)
-    elif (spin <= 3478 + 3478 + 2608): # 500 points
-      result.add_points(300 * multiplier * spin_multiplier)
-    else: # 1000 dice
-      result.add_points(400 * multiplier * spin_multiplier)
+    result.add_points(points * spin_multiplier * multiplier)
   
   def get_value(self):
     # spin points
