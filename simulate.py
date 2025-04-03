@@ -2,6 +2,7 @@ import random
 from abc import ABC, abstractmethod
 import csv
 import statistics
+import copy
 
 #region classes
 class SimulationDetails:
@@ -11,25 +12,33 @@ class SimulationDetails:
     self.label = label
     self.multipliers = multipliers
 
+class SimResultState:
+  """The Sim Result Stats
+  """
+  def __init__(self, points: int = 0, rolls_done: int = 0, initial_dice: int = 0, free_dice: int = 0, gems: int = 0, chroma: int = 0, obsidian: int = 0, otta: int = 0, gold: int = 0):
+    self.points = points
+    self.rolls_done = rolls_done
+    self.initial_dice = initial_dice
+    self.free_dice = free_dice
+    self.gems = gems
+    self.chroma = chroma
+    self.obsidian = obsidian
+    self.otta = otta
+    self.gold = gold
+
 class SimResult:
   """Result of a simulation
   """
-  points: int = 0
-  rolls_done: int = 0
-  initial_dice: int = 0
-  free_dice: int = 0
-  gems: int = 0
-  chroma: int = 0
-  obsidian: int = 0
-  otta: int = 0
-  gold: int = 0
-
   points_breakpoints = [bp + s for s in [0, 20000, 40000, 60000, 80000] for bp in [2000, 5000, 8000, 12000, 16000, 20000]]
-  points_bp_met = -1
 
   roll_dice_task_breakpoints = [5, 10, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
   roll_dice_task_reward = [1, 2, 2, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
-  roll_dice_bp_met = -1
+
+  def __init__(self):
+    self.current_state = SimResultState()
+    self.saved_state: list[tuple[int, SimResultState]] = []
+    self.points_bp_met = -1
+    self.roll_dice_bp_met = -1
 
   def add_points(self, num_points: int):
     """Add points to the result AND get the number of dice we get back from meeting points breakpoints
@@ -41,17 +50,17 @@ class SimResult:
       return 0
     
     # add points to result
-    self.points += num_points
+    self.current_state.points += num_points
 
     # check if we met any points breakpoints
     num_dice = 0
     for bp in self.points_breakpoints[self.points_bp_met+1:]:
-      if (self.points < bp):
+      if (self.current_state.points < bp):
         break
       self.points_bp_met += 1
       num_dice += 2
 
-    self.free_dice += num_dice
+    self.current_state.free_dice += num_dice
   
   def add_rolls(self, num_rolls: int):
     """Add number of rolls to the result AND get the number of dice we get back from meeting Roll Dice task breakpoints
@@ -63,22 +72,30 @@ class SimResult:
       return 0
 
     # add rolls done to result
-    self.rolls_done += num_rolls
+    self.current_state.rolls_done += num_rolls
 
     # ONLY add to initial dice IF we run out of free dice
-    if (self.free_dice <= num_rolls):
-      self.initial_dice += num_rolls - self.free_dice
-    self.free_dice = max(0, self.free_dice - num_rolls)
+    if (self.current_state.free_dice <= num_rolls):
+      self.current_state.initial_dice += num_rolls - self.current_state.free_dice
+    self.current_state.free_dice = max(0, self.current_state.free_dice - num_rolls)
 
     # check if we meet any task breakpoints
     num_dice = 0
     for bp in self.roll_dice_task_breakpoints[self.roll_dice_bp_met+1:]:
-      if (self.rolls_done < bp):
+      if (self.current_state.rolls_done < bp):
         break
       self.roll_dice_bp_met += 1
       num_dice = self.roll_dice_task_reward[self.roll_dice_bp_met]
 
-    self.free_dice += num_dice
+    self.current_state.free_dice += num_dice
+
+  def save(self, current_position):
+    """Save the history of state
+
+    Args:
+      current_position (int): Current position that we are on
+    """
+    self.saved_state.append([current_position, copy.deepcopy(self.current_state)])
 
 class Tile(ABC):
   """
@@ -132,9 +149,9 @@ class FlatTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
     result.add_points(self.points * multiplier)
 
-    result.gems += (self.gems * multiplier)
+    result.current_state.gems += (self.gems * multiplier)
 
-    result.free_dice += (self.dice * multiplier)
+    result.current_state.free_dice += (self.dice * multiplier)
 
   def get_value(self):
     return self.points, self.dice
@@ -143,17 +160,17 @@ class GrandPrizeTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
     spin = random.randint(1,10000)
     if (spin <= 666): # 2x chroma keys
-      result.chroma += (2 * multiplier)
+      result.current_state.chroma += (2 * multiplier)
     elif (spin <= 666 + 2666): # 1x obsidian key
-      result.obsidian += (1 * multiplier)
+      result.current_state.obsidian += (1 * multiplier)
     elif (spin <= 666 + 2666 + 2666): # 100 gems
-      result.gems += (100 * multiplier)
+      result.current_state.gems += (100 * multiplier)
     elif (spin <= 666 + 2666 + 2666 + 666): # 1x chroma key
-      result.chroma += (1 * multiplier)
+      result.current_state.chroma += (1 * multiplier)
     elif (spin <= 666 + 2666 + 2666 + 666 + 666): # 2x dice
-      result.free_dice += (2 * multiplier)
+      result.current_state.free_dice += (2 * multiplier)
     else: # 1x dice
-      result.free_dice += (1 * multiplier)
+      result.current_state.free_dice += (1 * multiplier)
   
   def get_value(self):
     return 0, (666 * 2 + 2666 * 1) / 10000
@@ -191,13 +208,13 @@ class FateWheelTile(Tile):
     if (spin <= 2500): # 100 points
       result.add_points(500 * multiplier)
     elif (spin <= 2500 + 300): # 2x otta
-      result.otta += (2 * multiplier)
+      result.current_state.otta += (2 * multiplier)
     elif (spin <= 2500 + 300 + 700): # 1x chroma key
-      result.chroma += (1 * multiplier)
+      result.current_state.chroma += (1 * multiplier)
     elif (spin <= 2500 + 300 + 700 + 1500): # 1x dice
-      result.free_dice += (1 * multiplier)
+      result.current_state.free_dice += (1 * multiplier)
     else: # 2000 gold
-      result.gold += (2000 * multiplier)
+      result.current_state.gold += (2000 * multiplier)
   
   def get_value(self):
     return (500 * 2500) / 10000, (1500 * 1) / 10000
@@ -351,33 +368,36 @@ def output_stats(runs: list[SimResult], comparator: int):
   total_obsidian = 0
   total_otta = 0
   total_gold = 0
+  tiles_hit_freq = [0] * 24
   min_index = max_index = 0
-  min_value = max_value = runs[0].initial_dice if comparator == 2 else runs[0].points
+  min_value = max_value = runs[0].current_state.initial_dice if comparator == 2 else runs[0].current_state.points
   for i in range(num_rounds):
     run = runs[i]
-    total_points += run.points
-    total_rolls_done += run.rolls_done
-    total_initial_dice += run.initial_dice
-    total_free_dice += run.free_dice
-    total_gems += run.gems
-    total_chroma += run.chroma
-    total_obsidian += run.obsidian
-    total_otta += run.otta
-    total_gold += run.gold
+    total_points += run.current_state.points
+    total_rolls_done += run.current_state.rolls_done
+    total_initial_dice += run.current_state.initial_dice
+    total_free_dice += run.current_state.free_dice
+    total_gems += run.current_state.gems
+    total_chroma += run.current_state.chroma
+    total_obsidian += run.current_state.obsidian
+    total_otta += run.current_state.otta
+    total_gold += run.current_state.gold
+    for state in run.saved_state:
+      tiles_hit_freq[state[0]] += 1
     if (comparator == 2): # get min/max based on number of dice needed initially
-      if (run.initial_dice < min_value):
+      if (run.current_state.initial_dice < min_value):
         min_index = i
-        min_value = run.initial_dice
-      if (run.initial_dice > max_value):
+        min_value = run.current_state.initial_dice
+      if (run.current_state.initial_dice > max_value):
         max_index = i
-        max_value = run.initial_dice
+        max_value = run.current_state.initial_dice
     else: # get min/max based on points gotten
-      if (run.points < min_value):
+      if (run.current_state.points < min_value):
         min_index = i
-        min_value = run.points
-      if (run.points > max_value):
+        min_value = run.current_state.points
+      if (run.current_state.points > max_value):
         max_index = i
-        max_value = run.points
+        max_value = run.current_state.points
   
   avg_points = total_points / num_rounds
   avg_initial_dice = total_initial_dice / num_rounds
@@ -395,9 +415,13 @@ def output_stats(runs: list[SimResult], comparator: int):
     otta=total_otta / num_rounds,
     gold=total_gold / num_rounds
   ))
-  min_points = runs[min_index].points
-  min_rolls = runs[min_index].rolls_done
-  min_dice = runs[min_index].initial_dice
+  for i in range(len(tiles_hit_freq)):
+    tiles_hit_freq[i] /= num_rounds
+  print(tiles_hit_freq)
+
+  min_points = runs[min_index].current_state.points
+  min_rolls = runs[min_index].current_state.rolls_done
+  min_dice = runs[min_index].current_state.initial_dice
   print(min_output.format(
     points=min_points,
     initial_dice=min_dice,
@@ -405,9 +429,10 @@ def output_stats(runs: list[SimResult], comparator: int):
     rolls=min_rolls,
     ppd=min_points / min_rolls,
   ))
-  max_points = runs[max_index].points
-  max_rolls = runs[max_index].rolls_done
-  max_dice = runs[max_index].initial_dice
+
+  max_points = runs[max_index].current_state.points
+  max_rolls = runs[max_index].current_state.rolls_done
+  max_dice = runs[max_index].current_state.initial_dice
   print(max_output.format(
     points=max_points,
     initial_dice=max_dice,
@@ -423,36 +448,37 @@ def output_csv(csv_file_name: str, runs: list[SimResult]):
       csvwriter.writerow(header)
       for run in runs:
         row = [
-          run.points,
-          run.initial_dice,
-          run.points / run.initial_dice,
-          run.rolls_done,
-          run.points / run.rolls_done,
-          run.gems,
-          run.chroma,
-          run.obsidian,
-          run.otta,
-          run.gold
+          run.current_state.points,
+          run.current_state.initial_dice,
+          run.current_state.points / run.current_state.initial_dice,
+          run.current_state.rolls_done,
+          run.current_state.points / run.current_state.rolls_done,
+          run.current_state.gems,
+          run.current_state.chroma,
+          run.current_state.obsidian,
+          run.current_state.otta,
+          run.current_state.gold
         ]
         csvwriter.writerow(row)
 #endregion helpers
 
-def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_rolls: int):
+def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_rolls: int, save_history: bool = False):
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
     board (list[Tile]): The board
     multipliers (list[int]): The multipliers to apply when rolling from each tile
     num_dice_rolls (int): Number of dice to start with
+    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
 
   Returns:
     SimResult: Result of simulation
   """
   result = SimResult()
   current_position = 0
-  while (result.initial_dice < num_dice_rolls or result.free_dice > 0) :
+  while (result.current_state.initial_dice < num_dice_rolls or result.current_state.free_dice > 0) :
     # get multiplier then check if it's allowed
-    num_turns = num_dice_rolls - result.initial_dice + result.free_dice
+    num_turns = num_dice_rolls - result.current_state.initial_dice + result.current_state.free_dice
     multiplier = multipliers[current_position]
     if (num_turns < 20):
       multiplier = min(1, multiplier)
@@ -471,23 +497,28 @@ def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_r
     current_position = (current_position + roll) % 24
     tile = board[current_position]
     tile.get_reward(multiplier, result)
+
+    # save history
+    if (save_history):
+      result.save(current_position)
   
   return result
 
-def simulate_meeting_points(board: list[Tile], multipliers: list[int], points_to_meet: int):
+def simulate_meeting_points(board: list[Tile], multipliers: list[int], points_to_meet: int, save_history: bool = False):
   """Simulate going around the board until we reach a points breakpoint
 
   Args:
     board (list[Tile]): The board
     multipliers (list[int]): The multipliers to apply when rolling from each tile
     points_to_meet (int): Number of points to reach until we end the simulation
+    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
 
   Returns:
     SimResult: Result of simulation
   """
   result = SimResult()
   current_position = 0
-  while (result.points < points_to_meet) :
+  while (result.current_state.points < points_to_meet) :
     # get multiplier from original position then check if it's allowed
     multiplier = multipliers[current_position]
 
@@ -499,10 +530,14 @@ def simulate_meeting_points(board: list[Tile], multipliers: list[int], points_to
     current_position = (current_position + roll) % 24
     tile = board[current_position]
     tile.get_reward(multiplier, result)
+
+    # save history
+    if (save_history):
+      result.save(current_position)
   
   return result
 
-def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], csv: bool = False):
+def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], csv: bool = False, save_history: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
@@ -511,6 +546,7 @@ def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rou
     num_rounds (int): The number of times to run simulation
     num_dices (list[int]): List of the number of dice to start each simulation with
     output_csv (bool): Whether we should output the runs in a CSV
+    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
   """
   for sim in sim_details:
     runs = []
@@ -519,14 +555,14 @@ def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rou
       print('Simulation of {:,} players starting with {:,} dice each:'.format(num_rounds, dices))
       print('Applied Multipliers: {}'.format(sim.multipliers))
       for i in range(num_rounds):
-        runs.append(simulate_starting_dice(board, sim.multipliers, dices))
+        runs.append(simulate_starting_dice(board, sim.multipliers, dices, save_history))
         if (i % 10000 == 9999):
           print(f'{i+1} sims done')
       output_stats(runs, 1)
     if (csv):
       output_csv(f'{sim.label}.csv', runs)
 
-def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, points_to_meet: int, csv: bool = False):
+def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, points_to_meet: int, csv: bool = False, save_history: bool = False):
   """Run simulations to get the average number of dice required initially to reach a specified point threshold. This does not take into account how many dice you actually have and will assume you can always apply the multiplier specified.
 
   Args:
@@ -535,6 +571,7 @@ def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rou
     num_rounds (int): The number of times to run simulation
     points_to_meet (int): Number of points to reach until we end the simulation
     output_csv (bool): Whether we should output the runs in a CSV
+    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
   """
   for sim in sim_details:
     runs = []
@@ -542,7 +579,7 @@ def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rou
     print('Simulation of {:,} players trying to reach {:,} points:'.format(num_rounds, points_to_meet))
     print('Applied Multipliers: {}'.format(sim.multipliers))
     for i in range(num_rounds):
-      runs.append(simulate_meeting_points(board, sim.multipliers, points_to_meet))
+      runs.append(simulate_meeting_points(board, sim.multipliers, points_to_meet, save_history))
       if (i % 10000 == 9999):
         print(f'{i+1} sims done')
 
@@ -578,9 +615,9 @@ board = [
 ]
 
 sims = [
-  SimulationDetails('BestMultipliers', calc_best_multipliers(board)),
-  SimulationDetails('NoMultipliers', [1] * 24),
-  SimulationDetails('6x10', [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
-  SimulationDetails('AcidIced', [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
-  SimulationDetails('4x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
+  SimulationDetails('BestMultipliers',  calc_best_multipliers(board)),
+  SimulationDetails('NoMultipliers',    [ 1 ] * 24),
+  SimulationDetails('6x10',             [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
+  SimulationDetails('AcidIced',         [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
+  SimulationDetails('4x10',             [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
 ]
