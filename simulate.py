@@ -361,7 +361,9 @@ def output_stats(runs: list[SimResult], comparator: int):
   num_rounds = len(runs)
   total_points = 0
   total_rolls_done = 0
+  total_ppd = 0
   total_initial_dice = 0
+  total_ppid = 0
   total_free_dice = 0
   total_gems = 0
   total_chroma = 0
@@ -375,7 +377,9 @@ def output_stats(runs: list[SimResult], comparator: int):
     run = runs[i]
     total_points += run.current_state.points
     total_rolls_done += run.current_state.rolls_done
+    total_ppd += run.current_state.points / run.current_state.rolls_done
     total_initial_dice += run.current_state.initial_dice
+    total_ppid += run.current_state.points / run.current_state.initial_dice
     total_free_dice += run.current_state.free_dice
     total_gems += run.current_state.gems
     total_chroma += run.current_state.chroma
@@ -399,15 +403,12 @@ def output_stats(runs: list[SimResult], comparator: int):
         max_index = i
         max_value = run.current_state.points
   
-  avg_points = total_points / num_rounds
-  avg_initial_dice = total_initial_dice / num_rounds
-  avg_rolls = total_rolls_done / num_rounds
   print(averages_output.format(
-    points=avg_points,
-    initial_dice=avg_initial_dice,
-    ppid=avg_points / avg_initial_dice,
-    rolls=avg_rolls,
-    ppd=avg_points / avg_rolls,
+    points=total_points / num_rounds,
+    initial_dice=total_initial_dice / num_rounds,
+    ppid=total_ppid / num_rounds,
+    rolls=total_rolls_done / num_rounds,
+    ppd=total_ppd / num_rounds,
     free_dice=total_free_dice / num_rounds,
     gems=total_gems / num_rounds,
     chroma=total_chroma / num_rounds,
