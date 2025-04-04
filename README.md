@@ -21,11 +21,13 @@ def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: in
   """
 ```
 1. In terminal, run `python -i simulate.py`
-2. You will see `>>>` which means you can now run the functions available in the script
+2. You will see `>>>` which means you can now run the functions available in the script.
 3. Example function usage: `>>> simulation(sim, board, 100_000, [400], 100_000)`
-   - This will run 100,000 rounds starting with 400 dice until we hit 100,000 points or run out of dice
-4. You can set `num_dices=[math.inf]` to... have infinite dice! This will only stop once we hit `points_to_meet`
-5. You can set `points_to_meet=math.inf` to... not have a points liimt. This will only stop once we run out of dice
+   - This will run 100,000 rounds starting with 400 dice until we hit 100,000 points or run out of dice.
+4. You can set `num_dices=[math.inf]` to... have infinite dice! This will only stop once we hit `points_to_meet`.
+   - This is useful for when you want to calculate average PPID of a multiplier map without concern over if you can meet highest multiplier.
+5. You can set `points_to_meet=math.inf` to... not have a points limit. This will only stop once we run out of dice.
+   - This is useful for when you want to draw up a risk tolerance table for each '# of starting dice' benchmark. You can easily group the rows with the same amount of starting dice and count how many passed the points breakpoint you were aiming for. 
 
 ### Adding a new multiplier
 We have calculated what we consider the best multipliers and it is saved in `sim` so check them out in `simulate.py`.
