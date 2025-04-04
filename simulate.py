@@ -338,26 +338,11 @@ averages_output = '''Averages:
 - Otta shards gotten: {otta:,}
 - Gold gotten: {gold:,}
 '''
-min_output = '''Min:
-- Number of points earned: {points:,}
-- Number of dice needed initially: {initial_dice:,}
-- Points per initial dice: {ppid:,}
-- Number of rolls overall: {rolls:,}
-- Points per roll: {ppd:,}
-'''
-max_output = '''Max:
-- Number of points earned: {points:,}
-- Number of dice needed initially: {initial_dice:,}
-- Points per initial dice: {ppid:,}
-- Number of rolls overall: {rolls:,}
-- Points per roll: {ppd:,}
-'''
-def output_stats(runs: list[SimResult], comparator: int):
+def output_stats(runs: list[SimResult]):
   """Output the stats of all the runs
 
   Args:
     runs (list[SimResult]): The simulation runs
-    comparator (int): Either 1 or 2. 1 = use number of points earned to determine min/max. 2 = use number of dice needed initially to determine min/max.
   """
   num_rounds = len(runs)
   total_points = 0
@@ -372,8 +357,6 @@ def output_stats(runs: list[SimResult], comparator: int):
   total_otta = 0
   total_gold = 0
   tiles_hit_freq = [0] * 24
-  min_index = max_index = 0
-  min_value = max_value = runs[0].current_state.initial_dice if comparator == 2 else runs[0].current_state.points
   for i in range(num_rounds):
     run = runs[i]
     total_points += run.current_state.points
@@ -389,20 +372,6 @@ def output_stats(runs: list[SimResult], comparator: int):
     total_gold += run.current_state.gold
     for state in run.saved_state:
       tiles_hit_freq[state[0]] += 1
-    if (comparator == 2): # get min/max based on number of dice needed initially
-      if (run.current_state.initial_dice < min_value):
-        min_index = i
-        min_value = run.current_state.initial_dice
-      if (run.current_state.initial_dice > max_value):
-        max_index = i
-        max_value = run.current_state.initial_dice
-    else: # get min/max based on points gotten
-      if (run.current_state.points < min_value):
-        min_index = i
-        min_value = run.current_state.points
-      if (run.current_state.points > max_value):
-        max_index = i
-        max_value = run.current_state.points
   
   print(averages_output.format(
     points=total_points / num_rounds,
@@ -420,28 +389,6 @@ def output_stats(runs: list[SimResult], comparator: int):
   for i in range(len(tiles_hit_freq)):
     tiles_hit_freq[i] /= num_rounds
   print(tiles_hit_freq)
-
-  min_points = runs[min_index].current_state.points
-  min_rolls = runs[min_index].current_state.rolls_done
-  min_dice = runs[min_index].current_state.initial_dice
-  print(min_output.format(
-    points=min_points,
-    initial_dice=min_dice,
-    ppid=min_points / min_dice,
-    rolls=min_rolls,
-    ppd=min_points / min_rolls,
-  ))
-
-  max_points = runs[max_index].current_state.points
-  max_rolls = runs[max_index].current_state.rolls_done
-  max_dice = runs[max_index].current_state.initial_dice
-  print(max_output.format(
-    points=max_points,
-    initial_dice=max_dice,
-    ppid=max_points / max_dice,
-    rolls=max_rolls,
-    ppd=max_points / max_rolls,
-  ))
 
 def output_csv(csv_file_name: str, runs: list[SimResult]):
   header = ['# of Points', '# of Dice Initially', 'Points per Initial Dice', '# of Rolls Done', 'Points per Roll', '# of Gems', '# of Chroma Keys', '# of Obsidian Keys', '# of Otta Shards', '# of Gold']
@@ -537,9 +484,9 @@ def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: in
       runs.append(simulate_single_run(board, sim_details.multipliers, dices, points_to_meet, save_history))
       if (i % 10000 == 9999):
         print(f'{i+1} sims done')
-    output_stats(runs, 1)
+    output_stats(runs)
   if (csv):
-    output_csv(f'{sim.label}.csv', runs)
+    output_csv(f'{sim_details.label}.csv', runs)
 
 
 board = [
