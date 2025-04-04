@@ -3,12 +3,14 @@ from abc import ABC, abstractmethod
 import csv
 import statistics
 import copy
+from typing import Dict
+import math
 
 #region classes
 class SimulationDetails:
   """Details about the simulation
   """
-  def __init__(self, label: str, multipliers: list[int]):
+  def __init__(self, label: str, multipliers: Dict[int, list[int]]):
     self.label = label
     self.multipliers = multipliers
 
@@ -221,22 +223,21 @@ class FateWheelTile(Tile):
 #endregion classes
 
 #region helpers
-def calc_best_multipliers(board: list[Tile]):
+def calc_best_multipliers(board: list[Tile], multiplier: int):
   """Calculate the best multipliers for the board
 
   Args:
     board (list[Tile]): The board
+    multiplier (int): The multiplier to set around the board
 
   Returns:
     list[int]: The best multipliers to apply when rolling from each tile of the board
   """
   tile_values: list[tuple[float,float]] = [tile.get_value() for tile in board]
-  
   #dice value is based on average dice gained per die / (1 - average die gained per die)
   dice_value = statistics.fmean([v[0] for v in tile_values]) / (1 - statistics.fmean([v[1] for v in tile_values]))
   # calculated value of tiles in terms of points with NO APPLIED MULTIPLIERS
   tile_calc_values = [v[0] + v[1]* dice_value for v in tile_values]
-
   # get the total point value of each tile based on what tiles can be reached from it
   def get_values(index: int, num_hits: int):
     points = tile_values[index][0] * num_hits / 36
@@ -312,7 +313,7 @@ def calc_best_multipliers(board: list[Tile]):
   best_multiplier = [1] * 24
   best_ppd = sum([best_multiplier[i] * tile_mult_value[i][2] for i in range(len(best_multiplier))]) / sum(best_multiplier)
   for i in range(len(sorted_index)):
-    best_multiplier[sorted_index[i]] = 10
+    best_multiplier[sorted_index[i]] = multiplier
 
     # average number of dice gained with multiplier applied
     avg_num_dice = sum([best_multiplier[j] * tile_mult_value[j][1] for j in range(len(best_multiplier))]) / sum(best_multiplier)
@@ -463,13 +464,14 @@ def output_csv(csv_file_name: str, runs: list[SimResult]):
         csvwriter.writerow(row)
 #endregion helpers
 
-def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_rolls: int, save_history: bool = False):
+def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num_dice_rolls: int, points_to_meet: int, save_history: bool = False):
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
     board (list[Tile]): The board
-    multipliers (list[int]): The multipliers to apply when rolling from each tile
-    num_dice_rolls (int): Number of dice to start with
+    multipliers (Dict[int,list[int]]): The multipliers to apply when rolling from each tile
+    num_dice_rolls (int): Number of dice to start with. The sim will stop if all of these dice are used.
+    points_to_meet (int): Number of points to aim for. The sim will stop if we reach this threshold even if we didn't use all starting dice.
     save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
 
   Returns:
@@ -477,10 +479,19 @@ def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_r
   """
   result = SimResult()
   current_position = 0
-  while (result.current_state.initial_dice < num_dice_rolls or result.current_state.free_dice > 0) :
+  while (result.current_state.points < points_to_meet and (result.current_state.initial_dice < num_dice_rolls or result.current_state.free_dice > 0)) :
     # get multiplier then check if it's allowed
     num_turns = num_dice_rolls - result.current_state.initial_dice + result.current_state.free_dice
-    multiplier = multipliers[current_position]
+    list_of_multipliers = [ 1 ] * 24
+    if (num_turns >= 100):
+      list_of_multipliers = multipliers[10]
+    elif (num_turns >= 50):
+      list_of_multipliers = multipliers[5]
+    elif (num_turns >= 30):
+      list_of_multipliers = multipliers[3]
+    elif (num_turns >= 20):
+      list_of_multipliers = multipliers[2]
+    multiplier = list_of_multipliers[current_position]
     if (num_turns < 20):
       multiplier = min(1, multiplier)
     elif (num_turns < 30):
@@ -505,88 +516,31 @@ def simulate_starting_dice(board: list[Tile], multipliers: list[int], num_dice_r
   
   return result
 
-def simulate_meeting_points(board: list[Tile], multipliers: list[int], points_to_meet: int, save_history: bool = False):
-  """Simulate going around the board until we reach a points breakpoint
-
-  Args:
-    board (list[Tile]): The board
-    multipliers (list[int]): The multipliers to apply when rolling from each tile
-    points_to_meet (int): Number of points to reach until we end the simulation
-    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
-
-  Returns:
-    SimResult: Result of simulation
-  """
-  result = SimResult()
-  current_position = 0
-  while (result.current_state.points < points_to_meet) :
-    # get multiplier from original position then check if it's allowed
-    multiplier = multipliers[current_position]
-
-    # roll the dice
-    old_tile = board[current_position]
-    roll = old_tile.roll(multiplier, result)
-
-    # land on new tile and get the reward
-    current_position = (current_position + roll) % 24
-    tile = board[current_position]
-    tile.get_reward(multiplier, result)
-
-    # save history
-    if (save_history):
-      result.save(current_position)
-  
-  return result
-
-def simulation1(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], csv: bool = False, save_history: bool = False):
+def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
-    sim_details (list[SimulationDetails]): Different multipliers to run
+    sim_details (SimulationDetails): Different multipliers to run depending on how many dice we have at the moment
     board (list[Tile]): The board
     num_rounds (int): The number of times to run simulation
     num_dices (list[int]): List of the number of dice to start each simulation with
+    points_to_meet (int): Number of points to aim for. The sim will stop if we reach this threshold even if we didn't use all starting dice.
     output_csv (bool): Whether we should output the runs in a CSV
     save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
   """
-  for sim in sim_details:
-    runs = []
-    print(sim.label)
-    for dices in num_dices:
-      print('Simulation of {:,} players starting with {:,} dice each:'.format(num_rounds, dices))
-      print('Applied Multipliers: {}'.format(sim.multipliers))
-      for i in range(num_rounds):
-        runs.append(simulate_starting_dice(board, sim.multipliers, dices, save_history))
-        if (i % 10000 == 9999):
-          print(f'{i+1} sims done')
-      output_stats(runs, 1)
-    if (csv):
-      output_csv(f'{sim.label}.csv', runs)
-
-def simulation2(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, points_to_meet: int, csv: bool = False, save_history: bool = False):
-  """Run simulations to get the average number of dice required initially to reach a specified point threshold. This does not take into account how many dice you actually have and will assume you can always apply the multiplier specified.
-
-  Args:
-    sim_details (list[SimulationDetails]): Different multipliers to run
-    board (list[Tile]): The board
-    num_rounds (int): The number of times to run simulation
-    points_to_meet (int): Number of points to reach until we end the simulation
-    output_csv (bool): Whether we should output the runs in a CSV
-    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
-  """
-  for sim in sim_details:
-    runs = []
-    print(sim.label)
-    print('Simulation of {:,} players trying to reach {:,} points:'.format(num_rounds, points_to_meet))
-    print('Applied Multipliers: {}'.format(sim.multipliers))
+  runs = []
+  print(sim_details.label)
+  for dices in num_dices:
+    print('Simulation of {:,} players starting with {:,} dice each trying to reach {:,} points:'.format(num_rounds, dices, points_to_meet))
+    print('Applied Multipliers: {}'.format(sim_details.multipliers))
     for i in range(num_rounds):
-      runs.append(simulate_meeting_points(board, sim.multipliers, points_to_meet, save_history))
+      runs.append(simulate_single_run(board, sim_details.multipliers, dices, points_to_meet, save_history))
       if (i % 10000 == 9999):
         print(f'{i+1} sims done')
+    output_stats(runs, 1)
+  if (csv):
+    output_csv(f'{sim.label}.csv', runs)
 
-    output_stats(runs, 2)
-    if (csv):
-      output_csv(f'{sim.label}.csv', runs)
 
 board = [
   FlatTile(points=400),
@@ -615,10 +569,19 @@ board = [
   FlatTile(points=200),
 ]
 
-sims = [
-  SimulationDetails('BestMultipliers',  calc_best_multipliers(board)),
-  SimulationDetails('NoMultipliers',    [ 1 ] * 24),
-  SimulationDetails('6x10',             [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
-  SimulationDetails('AcidIced',         [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
-  SimulationDetails('4x10',             [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
-]
+# SimulationDetails('AcidIced', [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
+# SimulationDetails('4x10',     [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
+
+sim = SimulationDetails('BestMultipliers', {
+  2: calc_best_multipliers(board,2),
+  3: calc_best_multipliers(board,3),
+  5: calc_best_multipliers(board,5),
+  10: calc_best_multipliers(board,10)
+})
+
+sim6x10 = SimulationDetails('6x10', {
+  2: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+  3: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+  5: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+  10: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]
+})
