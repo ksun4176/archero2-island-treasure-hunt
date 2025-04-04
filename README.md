@@ -7,11 +7,11 @@ This is mainly used to determine the best multipliers to apply to each of the ti
 
 ## How to run
 ```python
-def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
+def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
-    sim_details (SimulationDetails): Different multipliers to run depending on how many dice we have at the moment
+    sim_details (list[SimulationDetails]): List of multipliers to run
     board (list[Tile]): The board
     num_rounds (int): The number of times to run simulation
     num_dices (list[int]): List of the number of dice to start each simulation with
@@ -30,7 +30,7 @@ def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: in
    - This is useful for when you want to draw up a risk tolerance table for each '# of starting dice' benchmark. You can easily group the rows with the same amount of starting dice and count how many passed the points breakpoint you were aiming for. 
 
 ### Adding a new multiplier
-We have calculated what we consider the best multipliers and it is saved in `sim` so check them out in `simulate.py`.
+We have calculated what we consider the best multipliers and it is saved in `sims` so check them out in `simulate.py`.
 You can look at `calc_best_multipliers` to see how we did this math.
 
 To create a new one, you can:
@@ -45,4 +45,4 @@ To create a new one, you can:
       10: [multipliers (must be a list of 24 integers)],
     })
     ```
-3. Run `>>> simulation(new_sim, board, 10_000, [500], 100_000)`
+3. Run `>>> simulation([new_sim], board, 10_000, [500], 100_000)`

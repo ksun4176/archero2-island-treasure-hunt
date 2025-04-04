@@ -388,7 +388,7 @@ def output_stats(runs: list[SimResult]):
   ))
   for i in range(len(tiles_hit_freq)):
     tiles_hit_freq[i] /= num_rounds
-  print(tiles_hit_freq)
+  print(f'Tiles hit frequencies: {tiles_hit_freq}')
 
 def output_csv(csv_file_name: str, runs: list[SimResult]):
   header = ['# of Points', '# of Dice Initially', 'Points per Initial Dice', '# of Rolls Done', 'Points per Roll', '# of Gems', '# of Chroma Keys', '# of Obsidian Keys', '# of Otta Shards', '# of Gold']
@@ -463,11 +463,11 @@ def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num
   
   return result
 
-def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
+def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
-    sim_details (SimulationDetails): Different multipliers to run depending on how many dice we have at the moment
+    sim_details (list[SimulationDetails]): List of multipliers to run
     board (list[Tile]): The board
     num_rounds (int): The number of times to run simulation
     num_dices (list[int]): List of the number of dice to start each simulation with
@@ -475,18 +475,19 @@ def simulation(sim_details: SimulationDetails, board: list[Tile], num_rounds: in
     output_csv (bool): Whether we should output the runs in a CSV
     save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
   """
-  runs = []
-  print(sim_details.label)
-  for dices in num_dices:
-    print('Simulation of {:,} players starting with {:,} dice each trying to reach {:,} points:'.format(num_rounds, dices, points_to_meet))
-    print('Applied Multipliers: {}'.format(sim_details.multipliers))
-    for i in range(num_rounds):
-      runs.append(simulate_single_run(board, sim_details.multipliers, dices, points_to_meet, save_history))
-      if (i % 10000 == 9999):
-        print(f'{i+1} sims done')
-    output_stats(runs)
-  if (csv):
-    output_csv(f'{sim_details.label}.csv', runs)
+  for sim in sim_details:
+    runs = []
+    print(sim.label)
+    for dices in num_dices:
+      print('Simulation of {:,} players starting with {:,} dice each trying to reach {:,} points:'.format(num_rounds, dices, points_to_meet))
+      print('Applied Multipliers: {}'.format(sim.multipliers))
+      for i in range(num_rounds):
+        runs.append(simulate_single_run(board, sim.multipliers, dices, points_to_meet, save_history))
+        if (i % 10000 == 9999):
+          print(f'{i+1} sims done')
+      output_stats(runs)
+    if (csv):
+      output_csv(f'{sim.label}.csv', runs)
 
 
 board = [
@@ -519,23 +520,23 @@ board = [
 # SimulationDetails('AcidIced', [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
 # SimulationDetails('4x10',     [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
 
-sim = SimulationDetails('BestMultipliers', {
-  2: calc_best_multipliers(board,2),
-  3: calc_best_multipliers(board,3),
-  5: calc_best_multipliers(board,5),
-  10: calc_best_multipliers(board,10)
-})
-
-sim6x10 = SimulationDetails('6x10', {
-  2: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-  3: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-  5: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-  10: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]
-})
-
-simTest = SimulationDetails('test', {
-  2: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-  3: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-  5: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-  10: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-})
+sims = [
+  SimulationDetails('BestMultipliers', {
+    2: calc_best_multipliers(board,2),
+    3: calc_best_multipliers(board,3),
+    5: calc_best_multipliers(board,5),
+    10: calc_best_multipliers(board,10)
+  }),
+  SimulationDetails('6x10old', {
+    2: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+    3: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+    5: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
+    10: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]
+  }),
+  SimulationDetails('6x10test', {
+    2: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+    3: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+    5: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+    10: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+  })
+]
