@@ -22,7 +22,7 @@ def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_roun
 ```
 1. In terminal, run `python -i simulate.py`
 2. You will see `>>>` which means you can now run the functions available in the script.
-3. Example function usage: `>>> simulation(sim, board, 100_000, [400], 100_000)`
+3. Example function usage: `>>> simulation(sims, board, 100_000, [400], 100_000)`
    - This will run 100,000 rounds starting with 400 dice until we hit 100,000 points or run out of dice.
 4. You can set `num_dices=[math.inf]` to... have infinite dice! This will only stop once we hit `points_to_meet`.
    - This is useful for when you want to calculate average PPID of a multiplier map without concern over if you can meet highest multiplier.
@@ -45,4 +45,5 @@ To create a new one, you can:
       10: [multipliers (must be a list of 24 integers)],
     })
     ```
+   - If you want to use the same multiplier map for every single one, you can use `create_sim_details_same_mult(filename, multipliers: list[int])`.
 3. Run `>>> simulation([new_sim], board, 10_000, [500], 100_000)`

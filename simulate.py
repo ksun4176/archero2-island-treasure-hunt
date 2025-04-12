@@ -33,8 +33,8 @@ class SimResult:
   """
   points_breakpoints = [bp + s for s in [0, 20000, 40000, 60000, 80000] for bp in [2000, 5000, 8000, 12000, 16000, 20000]]
 
-  roll_dice_task_breakpoints = [5, 10, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
-  roll_dice_task_reward = [1, 2, 2, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+  roll_dice_task_breakpoints = [5, 10, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600]
+  roll_dice_task_reward = [1, 2, 2, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
   def __init__(self):
     self.current_state = SimResultState()
@@ -409,6 +409,23 @@ def output_csv(csv_file_name: str, runs: list[SimResult]):
           run.current_state.gold
         ]
         csvwriter.writerow(row)
+
+def create_sim_details_same_mult(label: str, multipliers: list[int]):
+  """Create a SimulationDetails with the same multiplier map at every level
+
+  Args:
+      label (str): label for SimulationDetails
+      multipliers (list[int]): multiplier map to apply
+
+  Returns:
+      SimulationDetails: The SimulationDetails
+  """
+  return SimulationDetails(label, {
+    2: multipliers,
+    3: multipliers,
+    5: multipliers,
+    10: multipliers,
+  })
 #endregion helpers
 
 def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num_dice_rolls: int, points_to_meet: int, save_history: bool = False):
@@ -489,7 +506,6 @@ def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_roun
     if (csv):
       output_csv(f'{sim.label}.csv', runs)
 
-
 board = [
   FlatTile(points=400),
   FlatTile(gems=50),
@@ -517,9 +533,6 @@ board = [
   FlatTile(points=200),
 ]
 
-# SimulationDetails('AcidIced', [ 1, 1, 1, 1, 2, 3, 3, 5, 5, 2, 1, 1, 1, 1, 1, 1, 2, 3, 5, 10, 10, 10, 5, 2 ]),
-# SimulationDetails('4x10',     [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1 ]),
-
 sims = [
   SimulationDetails('BestMultipliers', {
     2: calc_best_multipliers(board,2),
@@ -527,16 +540,123 @@ sims = [
     5: calc_best_multipliers(board,5),
     10: calc_best_multipliers(board,10)
   }),
-  SimulationDetails('6x10old', {
+  SimulationDetails('6x10', {
     2: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
     3: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
     5: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
     10: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]
-  }),
-  SimulationDetails('6x10test', {
-    2: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    3: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    5: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    10: [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
   })
 ]
+
+# def fiery_sim():
+#   def get_stats(runs: list[SimResult], points_to_meet: int):
+#     num_rounds = len(runs)
+#     total_points = 0
+#     total_initial_dice = 0
+#     total_free_dice = 0
+#     num_over_threshold = 0
+#     for i in range(num_rounds):
+#       run = runs[i]
+#       if (run.current_state.points >= points_to_meet):
+#         num_over_threshold += 1
+#       total_points += run.current_state.points
+#       total_initial_dice += run.current_state.initial_dice
+#       total_free_dice += run.current_state.free_dice
+    
+#     avg_points = total_points / num_rounds
+#     avg_initial_dice = total_initial_dice / num_rounds
+#     avg_free_dice = total_free_dice / num_rounds
+#     ppid = avg_points / (avg_initial_dice - avg_free_dice)
+#     return num_over_threshold, ppid
+
+#   def compile_stats(sim_results: list[int, int, tuple[list[int], int, int]]):
+#     winning_count = 0
+#     winners = []
+#     for i in range(len(sim_results)):
+#       map_stats = sim_results[i]
+#       if (map_stats[3] > winning_count):
+#         winning_count = map_stats[3]
+#         winners = [{ 'multipliers': map_stats[2], 'ppid': map_stats[4] }]
+#       elif (map_stats[3] == winning_count):
+#         winners.append({ 'multipliers': map_stats[2], 'ppid': map_stats[4] })
+#     return winning_count, winners
+
+#   def create_maps():
+#     map_template = [False, False, False, False, False, False, False, True, True, True, False, False, False, False, False, False, False, False, False, False, True, True, True, False]
+#     maps = []
+#     def traverse(maps: list[list[int]], index: int, map_to_build: list[int]):
+#       if (index == len(map_template)):
+#         maps.append(map_to_build)
+#         return
+#       if (not map_template[index]):
+#         map_to_build.append(1)
+#         traverse(maps, index+1, map_to_build)
+#       else:
+#         map1 = map_to_build.copy()
+#         map1.append(1)
+#         traverse(maps, index+1, map1)
+#         map2 = map_to_build.copy()
+#         map2.append(2)
+#         traverse(maps, index+1, map2)
+#         map3 = map_to_build.copy()
+#         map3.append(3)
+#         traverse(maps, index+1, map3)
+#         map5 = map_to_build.copy()
+#         map5.append(5)
+#         traverse(maps, index+1, map5)
+#     traverse(maps, 0, [])
+#     sim_maps = list(map(create_sim_details_same_mult, [f'map{i}' for i in range(len(maps))], maps))
+#     return sim_maps
+#   maps = create_maps()
+
+#   sims = {
+#     20_000: {
+#       "dices": [10 * i for i in range(5,11)],
+#       "maps": maps
+#     },
+#     40_000: {
+#       "dices": [10 * i for i in range(11,19)],
+#       "maps": maps
+#     },
+#   }
+
+#   all_results = []
+#   all_compiled_results = {}
+#   for points_to_meet in sims.keys():
+#     compiled_results = {}
+#     for dices in sims[points_to_meet]["dices"]:
+#       num_sims = len(sims[points_to_meet]["maps"])
+#       results = []
+#       count = 0
+#       print(f'Simulation of 10,000 players starting with {dices:,} dice each trying to reach {points_to_meet:,} points:')
+#       for sim in sims[points_to_meet]["maps"]:
+#         map_runs = []
+#         for i in range(10_000):
+#           map_runs.append(simulate_single_run(board, sim.multipliers, dices, math.inf))
+#         num_over_thresold, ppid = get_stats(map_runs, points_to_meet)
+#         results.append([points_to_meet, dices, sim.multipliers[2], num_over_thresold, ppid])
+#         count += 1
+#         print(f'{points_to_meet:,} points {dices} dices: {count}/{num_sims} sims complete')
+#       all_results += results
+#       winning_count, best_results = compile_stats(results)
+#       compiled_results[dices] = {
+#         'success rate': winning_count/10_000*100,
+#         'results': best_results
+#       }
+#     all_compiled_results[points_to_meet] = compiled_results
+#   print(all_compiled_results)
+#   def output_results_into_csv():
+#     header = ['# of Points', '# of Dice Initially', 'Multiplier Map', 'Success Rate', 'PPID']
+#     with open('fiery_wind.csv', 'w', newline='') as csvfile:
+#         csvwriter = csv.writer(csvfile)
+#         csvwriter.writerow(header)
+#         for result in all_results:
+#           row = [
+#             result[0],
+#             result[1],
+#             result[2],
+#             result[3] / 10_000 * 100,
+#             result[4]
+#           ]
+#           csvwriter.writerow(row)
+#   output_results_into_csv()
