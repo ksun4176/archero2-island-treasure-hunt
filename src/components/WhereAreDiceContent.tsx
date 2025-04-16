@@ -188,7 +188,7 @@ const Row = (props: RowProps) => {
         onNumDiceChange(quest.name, isChecked ? numDiceLeft.current : 0)
       }
     },
-    []
+    [quest.name, onNumDiceChange]
   );
 
   const handleProgressChange = useCallback(
@@ -206,7 +206,7 @@ const Row = (props: RowProps) => {
         onNumDiceChange(quest.name, numDiceLeft.current);
       }
     },
-    []
+    [quest, onNumDiceChange]
   )
 
   return (
