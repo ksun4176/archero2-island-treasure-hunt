@@ -271,9 +271,7 @@ export default function WhereAreDiceContent() {
         <ul className="list-disc ms-5">
           {quests.filter(quest => quest.fromRolling).map((quest, index) => (
             <li key={index}>
-              <strong>{quest.name} Quest</strong>: 
-              {quest.breakpoints[1].reduce((prev, current) => prev + current)} dice available
-              with breakpoints ranging from {quest.breakpoints[0][0]} to {quest.breakpoints[0][quest.breakpoints[0].length-1]}
+              <strong>{quest.name} Quest</strong>: {quest.breakpoints[1].reduce((prev, current) => prev + current)} dice available with breakpoints ranging from {quest.breakpoints[0][0]} to {quest.breakpoints[0][quest.breakpoints[0].length-1]}
             </li>
           ))}
           <li><strong>Rolling Around Board</strong>: There are a few tiles on the board that gives free dice when you land on them</li>
