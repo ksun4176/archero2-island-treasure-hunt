@@ -255,7 +255,7 @@ export default function WhereAreDiceContent() {
     <div>
       <div className="pb-8 ">
         <h3 className="text-lg font-semibold">Quests that you can complete without rolling</h3>
-        <p className="pb-2">These quests affects your Points per Initial Dice (PPID) as it adds to your '# of Starting Dice'.</p>
+        <p className="pb-2">{`These quests affects your Points per Initial Dice (PPID) as it adds to your '# of Starting Dice'.`}</p>
         <div className="flex flex-col">
           {quests.filter(quest => !quest.fromRolling).map((quest, index) => (
             <Row key={index} quest={quest} onNumDiceChange={onNumDiceChange}/>
