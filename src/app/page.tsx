@@ -10,7 +10,7 @@ import ShouldRollContent from "@/components/ShouldRollContent";
 type Section = {
   href: string;
   label: string;
-  heading: string;
+  heading: React.ReactNode;
   content?: JSX.Element;
 }
 
@@ -18,35 +18,35 @@ const sections: Section[] = [
   {
     href: "multiplier-map",
     label: "Multiplier Map",
-    heading: "Multiplier Map ( • ̀ω•́ )✧",
+    heading: <>Multiplier Map <span className="whitespace-nowrap">( • ̀ω•́ )✧</span></>,
     content: <MultiplierMapContent />,
   },
   {
     href: "where-are-the-dice",
     label: "Where are the dice?!",
-    heading: "Where are the dice?! (╯°□°)╯︵ ┻━┻",
+    heading: <>Where are the dice?! <span className="whitespace-nowrap">(╯°□°)╯︵ ┻━┻</span></>,
     content: <WhereAreDiceContent />,
   },
   {
     href: "should-i-roll",
     label: "Should I roll?",
-    heading: "Should I roll? ¯\\_(ツ)_/¯",
+    heading: <>Should I roll? <span className="whitespace-nowrap">¯\\_(ツ)_/¯</span></>,
     content: <ShouldRollContent />,
   },
   {
     href: "ppid-calculator",
     label: "PPID Calculator",
-    heading: "Points per Dice Calculator ◁ |⚙⌨⚙| ▷",
+    heading: <>Points per Dice Calculator <span className="whitespace-nowrap">◁ |⚙⌨⚙| ▷</span></>,
   },
   {
     href: "tips-for-newbies",
     label: "Tips for Newbies",
-    heading: "Tips for Newbies ◕⩊◕",
+    heading: <>Tips for Newbies <span className="whitespace-nowrap">◕⩊◕</span></>,
   },
   {
     href: "faq",
     label: "FAQs",
-    heading: "FAQs (º～º)",
+    heading: <>FAQs <span className="whitespace-nowrap">(º～º)</span></>,
   }
 ]
 

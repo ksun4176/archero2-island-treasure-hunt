@@ -92,11 +92,11 @@ export default function ShouldRollContent() {
             <th className="px-1">
               <IntervalSelect name="intervalSelect" initialValue={intervals[3]} onValueChange={handleIntervalChange} />
             </th >
-            <th className="px-1 text-center">20000</th>
-            <th className="px-1 text-center">40000</th>
-            <th className="px-1 text-center">60000</th>
-            <th className="px-1 text-center">80000</th>
-            <th className="px-1 text-center">100000</th>
+            <th className="px-1 text-center">20k</th>
+            <th className="px-1 text-center">40k</th>
+            <th className="px-1 text-center">60k</th>
+            <th className="px-1 text-center">80k</th>
+            <th className="px-1 text-center">100k</th>
           </tr>
         </thead>
         <tbody>
