@@ -90,14 +90,19 @@ return (
           </ul>
         </div>
       </Drawer>
-      <div className="flex items-start h-full gap-2 p-2">
+      <div className="flex items-start h-full gap-2 py-2 md:px-2">
         {/* Table of Content */}
         <div className="grow-0 bg-gray-100 dark:bg-gray-800 p-2 rounded sticky top-[40px] hidden md:block">
           <div className="text-xl font-semibold">Table of content</div>
           <ul className="mt-2 list-disc pr-2 pl-6">
             {sections.map(section => 
               <li key={section.href}>
-                <a className="block hover:bg-gray-200 dark:hover:bg-gray-900 px-2 py-1 rounded" href={`#${section.href}`}>{section.label}</a>
+                <a
+                  className="block hover:bg-gray-200 dark:hover:bg-gray-900 px-2 py-1 rounded"
+                  href={`#${section.href}`}
+                >
+                  {section.label}
+                </a>
               </li>
             )}
           </ul>
@@ -107,7 +112,12 @@ return (
           <div className="p-2 bg-gray-100 dark:bg-gray-800 ">
             {sections.map((section, index) =>
               <div id="container" key={index} className="w-full flex flex-col mb-8">
-                <h2 id={section.href} className="font-semibold text-2xl border-b border-gray-500 mb-1">{section.heading}</h2>
+                <h2
+                  id={section.href}
+                  className="font-semibold text-2xl border-b border-gray-500 mb-1 -mt-[50px] pt-[50px]"
+                >
+                  {section.heading}
+                </h2>
                 {section.content}
               </div>
             )}
