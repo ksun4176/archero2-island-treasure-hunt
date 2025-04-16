@@ -24,6 +24,45 @@ const OrderedList = (props: OrderedListProps) => {
   </ol>
 }
 
+type Stat = {
+  label: string;
+  stat: number;
+}
+const statsFor100k: Stat[] = [
+  {
+    label: '# of Starting Dice',
+    stat: 268
+  },
+  {
+    label: 'PPID',
+    stat: 391.26
+  },
+  {
+    label: 'Total Rolls Completed',
+    stat: 498
+  },
+  {
+    label: 'PPR',
+    stat: 205.99
+  },
+  {
+    label: '# of Leftover Dice',
+    stat: 5.68
+  },
+  {
+    label: 'Gems Gotten',
+    stat: 2480.21
+  },
+  {
+    label: 'Chroma Key Gotten',
+    stat: 3.72
+  },
+  {
+    label: 'Otta Shards Gotten',
+    stat: 0.48
+  }
+]
+
 export default function MultiplierMapContent() {
   return (
     <div id="container" className="w-full flex flex-col-reverse lg:flex-row">
@@ -62,6 +101,21 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
+        <table className="w-full border-collapse border border-gray-700 max-w-3xs mx-auto">
+          <thead>
+            <tr className="bg-gray-400 dark:bg-gray-700">
+              <th className="p-1 text-center" colSpan={2}>Average for 100k points</th>
+            </tr>
+          </thead>
+          <tbody>
+            {statsFor100k.map((stat, index) => (
+              <tr key={index} className="border-b border-gray-700">
+                <td className="p-1">{stat.label}</td>
+                <td className="p-1">{stat.stat}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
       <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">
         <Image
@@ -73,6 +127,7 @@ export default function MultiplierMapContent() {
           priority
           unoptimized
         />
+        <p className="text-sm">Credit to Fierywind and Howdy</p>
       </div>
     </div>
   );

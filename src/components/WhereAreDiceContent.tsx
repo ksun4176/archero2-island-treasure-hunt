@@ -122,11 +122,11 @@ const quests: Quest[] = [
 ]
 
 type IntegerInputProps = {
-  id?: string;
+  name: string;
   onValueChange?: (value: number) => void;
 }
 const IntegerInput = (props: IntegerInputProps) => {
-  const { id, onValueChange } = props;
+  const { name, onValueChange } = props;
   const [value, setValue] = useState('');
 
   const handleChange = useCallback(
@@ -144,7 +144,7 @@ const IntegerInput = (props: IntegerInputProps) => {
 
   return (
     <input
-      id={id}
+      name={name}
       type="text"
       inputMode="numeric"
       autoComplete="off"
@@ -215,23 +215,21 @@ const Row = (props: RowProps) => {
         {quest.name}
       </div>
       <div className="col-span-2 flex gap-2">
-        <fieldset className="flex gap-1">
-          <label htmlFor="progressInput">Progress:</label>
-          <IntegerInput id="progressInput" onValueChange={handleProgressChange}/>
-        </fieldset>
-        <ProgressBar percentDone={Math.round(numBreakpointsMet/numBreakpoints*100)}/>
+        <label className="flex gap-1">
+          Progress:
+          <IntegerInput name="progressInput" onValueChange={handleProgressChange} />
+        </label>
+        <ProgressBar percentDone={Math.round(numBreakpointsMet/numBreakpoints*100)} />
       </div>
       <div>{`Dice Left: ${numDiceLeft.current}`}</div>
-      {quest.optional && <fieldset className="flex gap-1">
-        <label htmlFor="includeCheckbox">
-          Include in Total?
-        </label>
+      {quest.optional && <label className="flex gap-1">
+        Include in Total?
         <input
-          id="includeCheckbox"
+          name="includeCheckbox"
           type="checkbox"
           checked={includeRow}
           onChange={handleCheckboxChange} />
-      </fieldset>}
+      </label>}
     </div>
   )
 }

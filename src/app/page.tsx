@@ -5,10 +5,12 @@ import { IconButton } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from '@mui/icons-material/Menu';
 import { JSX, useState } from "react";
+import ShouldRollContent from "@/components/ShouldRollContent";
 
 type Section = {
   href: string;
   label: string;
+  heading: string;
   content?: JSX.Element;
 }
 
@@ -16,28 +18,35 @@ const sections: Section[] = [
   {
     href: "multiplier-map",
     label: "Multiplier Map",
-    content: <MultiplierMapContent />
+    heading: "Multiplier Map ( • ̀ω•́ )✧",
+    content: <MultiplierMapContent />,
   },
   {
     href: "where-are-the-dice",
     label: "Where are the dice?!",
-    content: <WhereAreDiceContent />
+    heading: "Where are the dice?! (╯°□°)╯︵ ┻━┻",
+    content: <WhereAreDiceContent />,
   },
   {
     href: "should-i-roll",
-    label: "Should I roll?"
+    label: "Should I roll?",
+    heading: "Should I roll? ¯\\_(ツ)_/¯",
+    content: <ShouldRollContent />,
   },
   {
     href: "ppid-calculator",
-    label: "PPID Calculator"
+    label: "PPID Calculator",
+    heading: "Points per Dice Calculator ◁ |⚙⌨⚙| ▷",
   },
   {
-    href: "tips-for-new-users",
-    label: "Tips for New Users"
+    href: "tips-for-newbies",
+    label: "Tips for Newbies",
+    heading: "Tips for Newbies ◕⩊◕",
   },
   {
     href: "faq",
-    label: "FAQs"
+    label: "FAQs",
+    heading: "FAQs (º～º)",
   }
 ]
 
@@ -99,7 +108,7 @@ return (
         <div className="m-2">
           {sections.map(section =>
             <div id="container" key={section.href} className="w-full flex flex-col mb-8">
-              <h2 id={section.href} className="font-semibold text-2xl border-b border-gray-500 mb-1">{section.label}</h2>
+              <h2 id={section.href} className="font-semibold text-2xl border-b border-gray-500 mb-1">{section.heading}</h2>
               {section.content}
             </div>
           )}
