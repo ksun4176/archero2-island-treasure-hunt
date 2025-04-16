@@ -58,12 +58,24 @@ export default function Home() {
   };
 
 return (
-    <div className="flex items-start min-h-screen gap-2 p-4 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col min-h-screen font-[family-name:var(--font-geist-sans)]">
+      <div className="flex p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0]">
+        <div className="md:hidden">
+          <IconButton
+            size="small"
+            aria-label="open sidebar"
+            onClick={toggleSidebar(!sidebarOpen)}
+          >
+            <MenuIcon />
+          </IconButton>
+        </div>
+        <h1 className="font-semibold text-3xl">Island Treasure Hunt Guide</h1>
+      </div>
       {/* Sidebar */}
       <Drawer open={sidebarOpen} onClose={toggleSidebar(false)}>
-        <div className="p-4">
-          <div className="mx-auto text-xl font-semibold"><strong>Table of content</strong></div>
-          <ul className="mt-2 list-disc px-2 pl-6">
+        <div className="p-2">
+          <div className="text-xl font-semibold">Table of content</div>
+          <ul className="mt-2 list-disc pr-2 pl-6">
             {sections.map(section => 
               <li key={section.href}>
                 <a 
@@ -78,11 +90,11 @@ return (
           </ul>
         </div>
       </Drawer>
-      {/* Table of Content */}
-      <div className="grow-0 shrink-0 basis-3xs hidden sm:block">
-        <div className="bg-gray-100 dark:bg-gray-800 w-3xs px-4 py-3 break-words rounded fixed">
-          <div className="mx-auto text-xl font-semibold">Table of content</div>
-          <ul className="mt-2 list-disc px-2 pl-6">
+      <div className="flex items-start h-full gap-2 p-2">
+        {/* Table of Content */}
+        <div className="grow-0 bg-gray-100 dark:bg-gray-800 p-2 rounded sticky top-[40px] hidden md:block">
+          <div className="text-xl font-semibold">Table of content</div>
+          <ul className="mt-2 list-disc pr-2 pl-6">
             {sections.map(section => 
               <li key={section.href}>
                 <a className="block hover:bg-gray-200 dark:hover:bg-gray-900 px-2 py-1 rounded" href={`#${section.href}`}>{section.label}</a>
@@ -90,28 +102,16 @@ return (
             )}
           </ul>
         </div>
-      </div>
-      <div className="flex-[0_0_40px] sm:hidden">
-        <IconButton
-          size="medium"
-          aria-label="open sidebar"
-          onClick={toggleSidebar(!sidebarOpen)}
-          sx={{ position: 'fixed' }}
-        >
-          
-          <MenuIcon />
-        </IconButton>
-      </div>
-      {/* Content */}
-      <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-800 h-full">
-        <h1 className="font-bold text-3xl border-b border-gray-400 mb-8">Island Treasure Hunt Guide</h1>
-        <div className="m-2">
-          {sections.map(section =>
-            <div id="container" key={section.href} className="w-full flex flex-col mb-8">
-              <h2 id={section.href} className="font-semibold text-2xl border-b border-gray-500 mb-1">{section.heading}</h2>
-              {section.content}
-            </div>
-          )}
+        {/* Content */}
+        <div className="flex-1 flex flex-col h-full">
+          <div className="p-2 bg-gray-100 dark:bg-gray-800 ">
+            {sections.map((section, index) =>
+              <div id="container" key={index} className="w-full flex flex-col mb-8">
+                <h2 id={section.href} className="font-semibold text-2xl border-b border-gray-500 mb-1">{section.heading}</h2>
+                {section.content}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
