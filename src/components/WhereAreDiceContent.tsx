@@ -206,7 +206,7 @@ const Row = (props: RowProps) => {
         onNumDiceChange(quest.name, numDiceLeft.current);
       }
     },
-    [quest, onNumDiceChange]
+    [includeRow, numBreakpointsMet, quest, onNumDiceChange]
   )
 
   return (
