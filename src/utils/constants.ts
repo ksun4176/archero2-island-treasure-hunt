@@ -1,0 +1,1 @@
+export const basePath = "/archero2-island-treasure-hunt";

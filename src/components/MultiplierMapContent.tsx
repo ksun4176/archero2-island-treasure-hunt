@@ -1,3 +1,4 @@
+import { basePath } from "@/utils/constants";
 import Image from "next/image";
 
 type Question = {
@@ -65,7 +66,7 @@ export default function MultiplierMapContent() {
       <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">
         <Image
           className="min-w-[200px] max-w-[350px]"
-          src="/multipliermap.png"
+          src={`${basePath}/multipliermap.png`}
           alt="Multiplier Map"
           height={663}
           width={436}
