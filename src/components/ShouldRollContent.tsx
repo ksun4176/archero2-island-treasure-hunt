@@ -63,23 +63,25 @@ export default function ShouldRollContent() {
       download: true,
       header: true,
       dynamicTyping: true,
-      complete: (results: ParseResult<DataRow>, _file: string) => {
+      complete: (results: ParseResult<DataRow>) => {
         if (results.errors.length === 0) {
           data.current = results.data;
           handleIntervalChange(intervals[3]);
         }
       },
     });
-  }, [])
+  }, [readRemoteFile, handleIntervalChange])
   
   return (
     <div>
-      <h3 className="text-lg font-semibold">{`What is '# of Starting Dice'?`}</h3>
-      <p className="pb-2">{`This is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see the quests that impact this. NOT ALL QUESTS DO.`}</p>
-      <p>
+      <p className="pb-2">
+        Decide for yourself when you should start rolling based on your own risk tolerance. <br />
+        You can save dice between events to have a better chance of hitting your points goal. <br />
+        The table below shows you the chance of reaching that points goal based on how many dice you started with. <br />
         <strong className="pb-2 underline">Tip</strong>: 
         During key rotation, you should at least roll until you get 50+ points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
       </p>
+      <p className="text-sm max-w-xl mx-auto">{`'Starting Dice' is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
       <table className="w-full max-w-xl border-collapse border border-gray-700 mx-auto">
         <thead>
           <tr className="bg-gray-400 dark:bg-gray-700">
