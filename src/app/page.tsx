@@ -120,7 +120,7 @@ return (
               <div id="container" key={index} className="w-full flex flex-col mb-8">
                 <h2
                   id={section.href}
-                  className="font-semibold text-2xl border-b border-gray-500 mb-1 -mt-[50px] pt-[50px] pointer-events-none"
+                  className="font-semibold text-2xl border-b border-gray-500 mb-1 -mt-13 pt-13 pointer-events-none"
                 >
                   {section.heading}
                 </h2>
