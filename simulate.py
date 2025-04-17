@@ -392,7 +392,7 @@ def output_stats(runs: list[SimResult]):
 
 def output_csv(csv_file_name: str, runs: list[SimResult]):
   header = ['# of Points', '# of Dice Initially', 'Points per Initial Dice', '# of Rolls Done', 'Points per Roll', '# of Gems', '# of Chroma Keys', '# of Obsidian Keys', '# of Otta Shards', '# of Gold']
-  with open(csv_file_name, 'w', newline='') as csvfile:
+  with open(f'generated/{csv_file_name}', 'w', newline='') as csvfile:
       csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
       csvwriter.writerow(header)
       for run in runs:
@@ -540,12 +540,7 @@ sims = [
     5: calc_best_multipliers(board,5),
     10: calc_best_multipliers(board,10)
   }),
-  SimulationDetails('6x10', {
-    2: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-    3: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-    5: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ],
-    10: [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]
-  })
+  create_sim_details_same_mult('6x10', [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ])
 ]
 
 # def fiery_sim():
