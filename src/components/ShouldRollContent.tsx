@@ -94,8 +94,8 @@ export default function ShouldRollContent() {
         <strong className="pb-2 underline">Tip</strong>: 
         During key rotation, you should at least roll until you get 50+ points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
       </p>
-      <p className="bg-gray-300 dark:bg-gray-900 text-sm max-w-xl ml-0 md:ml-8">{`*Starting Dice is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
-      <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0 md:ml-8">
+      <p className="bg-gray-300 dark:bg-gray-900 text-sm max-w-xl ml-0">{`*Starting Dice is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
+      <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0">
         <thead>
           <tr className="bg-gray-400 dark:bg-gray-700">
             <th className="pt-1 px-1 text-center">Starting Dice</th>

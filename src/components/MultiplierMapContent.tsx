@@ -101,7 +101,7 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <table className="w-full border-collapse border border-gray-700 max-w-3xs ml-0 md:ml-5">
+        <table className="w-full border-collapse border border-gray-700 max-w-3xs mx-auto lg:ml-0">
           <thead>
             <tr className="bg-gray-400 dark:bg-gray-700">
               <th className="p-1 text-center" colSpan={2}>Average for 100k points</th>
