@@ -3,7 +3,6 @@ import Image from "next/image";
 
 type Question = {
   question: string;
-  olAnswer?: string[];
 }
 
 type QuestionProps = {
@@ -67,9 +66,9 @@ export default function MultiplierMapContent() {
   return (
     <div id="container" className="w-full flex flex-col-reverse lg:flex-row">
       <div className="flex-1">
-        <div>
+        <div className="mb-2">
           <Question text="How do I use this map?" />
-          <div className="mb-2">
+          <div>
             <OrderedList items={[
                 "Check the map for the tile you are on",
                 "Change your multiplier to match the tile on the map (go as high as you can if you cannot do 10x)",
@@ -79,9 +78,9 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <div>
+        <div className="mb-2">
           <Question text="How did we come up with this map?" />
-          <div className="mb-2">
+          <div>
             <OrderedList items={[
                 "Calculated the expected value of each tile based on its points value and probability of getting dice.",
                 "Compute the projected value of each tile by factoring in the expected value of reachable tiles.",
@@ -91,9 +90,9 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <div>
+        <div className="mb-2">
           <Question text="Did we try other maps?" />
-          <div className="mb-2">
+          <div>
             <OrderedList items={[
                 "We ran simulations on several other proposed maps, but ours outperformed them.",
                 "We also explored \"safer\" maps with lower variance, but none offered a worthwhile tradeoff in efficiency.",

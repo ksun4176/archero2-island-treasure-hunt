@@ -8,6 +8,7 @@ import Drawer from "@mui/material/Drawer";
 import MenuIcon from '@mui/icons-material/Menu';
 import { JSX, useState } from "react";
 import TipsForNewContent from "@/components/TipsForNewContent";
+import FaqContent from "@/components/FaqContent";
 
 type Section = {
   href: string;
@@ -45,12 +46,13 @@ const sections: Section[] = [
     href: "tips-for-newbies",
     label: "Tips for Newbies",
     heading: <>Tips for Newbies <span className="whitespace-nowrap">◕⩊◕</span></>,
-    content: <TipsForNewContent />
+    content: <TipsForNewContent />,
   },
   {
     href: "faq",
     label: "FAQs",
     heading: <>FAQs <span className="whitespace-nowrap">(º～º)</span></>,
+    content: <FaqContent />,
   }
 ]
 
@@ -63,7 +65,7 @@ export default function Home() {
 
 return (
     <div className="flex flex-col min-h-screen font-[family-name:var(--font-geist-sans)]">
-      <div className="flex p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0]">
+      <div className="flex p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0] z-1">
         <div className="md:hidden">
           <IconButton
             size="small"

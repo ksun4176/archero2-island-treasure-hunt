@@ -20,8 +20,7 @@ export default function TipsForNewContent() {
               <><strong>Once you are past 150k power</strong>, we strongly recommend saving resources to maximize number of dice you get from each rotation (Chroma Keys, Wishes, Shovels).</>,
               <><strong>Read the FAQs.</strong></>,
               <>Check out the rest of the guide as hopefully they make more sense now.</>,
-              <>
-                {`Ask questions on `}
+              <><p>{`Ask questions on `}
                 <a
                   href="https://discord.gg/archero2"
                   target="blank_"
@@ -29,7 +28,7 @@ export default function TipsForNewContent() {
                 >
                   Archero 2 Discord
                 </a>.
-              </>
+              </p></>
           ]}/>
         </div>
       </div>
