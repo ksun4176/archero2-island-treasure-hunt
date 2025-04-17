@@ -133,15 +133,15 @@ export default function PpidCalculatorContent() {
       result.percentile = "???"
     }
     else if (result.ppid) {
-      let breakpoints = [...new Set(data.current.map(d => d.breakpoint))];
+      const breakpoints = [...new Set(data.current.map(d => d.breakpoint))];
       breakpoints.sort((a,b) => b - a);
-      let startingDiceIntervals = [...new Set(data.current.map(d => d.startingDice))];
+      const startingDiceIntervals = [...new Set(data.current.map(d => d.startingDice))];
       startingDiceIntervals.sort((a,b) => a - b);
       
       const breakpoint = breakpoints.find(bp => values.current.points! >= bp);
       const startingDice = startingDiceIntervals.find(sd => result.numDice! <= sd);
 
-      let chance = data.current.find(d => d.breakpoint === breakpoint && d.startingDice === startingDice)?.chance;
+      const chance = data.current.find(d => d.breakpoint === breakpoint && d.startingDice === startingDice)?.chance;
       result.percentile = !chance ? "???" : `${(chance*100).toFixed(2)}%`;
     }
     setResult(result);
