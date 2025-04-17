@@ -7,6 +7,7 @@ import { IconButton } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from '@mui/icons-material/Menu';
 import { JSX, useState } from "react";
+import TipsForNewContent from "@/components/TipsForNewContent";
 
 type Section = {
   href: string;
@@ -44,6 +45,7 @@ const sections: Section[] = [
     href: "tips-for-newbies",
     label: "Tips for Newbies",
     heading: <>Tips for Newbies <span className="whitespace-nowrap">◕⩊◕</span></>,
+    content: <TipsForNewContent />
   },
   {
     href: "faq",

@@ -15,11 +15,11 @@ const Question = (props: QuestionProps) => {
 }
 
 type OrderedListProps = {
-  items: string[];
+  items: React.ReactNode[];
 }
 const OrderedList = (props: OrderedListProps) => {
   const { items } = props;
-  return <ol className="list-decimal ms-5">
+  return <ol className="list-decimal ms-5 flex flex-col gap-1">
     {items.map((item, index) => <li key={index}>{item}</li>)}
   </ol>
 }
