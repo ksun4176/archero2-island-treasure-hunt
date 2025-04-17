@@ -3,6 +3,7 @@ import { ParseResult } from 'papaparse';
 import { usePapaParse } from 'react-papaparse';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { basePath } from '@/utils/constants';
+import { DataRow } from '@/utils/types';
 
 const intervals = [5,10,20,25, 50, 100];
 type IntervalSelectProps = {
@@ -37,23 +38,28 @@ const IntervalSelect = (props: IntervalSelectProps) => {
   </select>
 }
 
-type DataRow = {
+type StartingDiceMap = Map<number, Map<number, string | null>>;
+
+type FormattedRow = {
   startingDice: number;
-  twenty: string;
-  forty: string;
-  sixty: string;
-  eighty: string;
-  hundred: string;
+  breakpointToChance: Map<number, string | null>;
 }
 
 export default function ShouldRollContent() {
   const { readRemoteFile } = usePapaParse();
-  const data = useRef<DataRow[]>([]);
-  const [rows, setRows] = useState<DataRow[]>([]);
+  const data = useRef<StartingDiceMap>(new Map());
+  const [rows, setRows] = useState<FormattedRow[]>([]);
 
   const handleIntervalChange = useCallback(
     (newValue: number) => {
-      setRows(data.current.filter(row => row.startingDice % newValue === 0));
+      const formattedRows: FormattedRow[] = [];
+      for (const [startingDice, breakpointToChance] of data.current) {
+        if (startingDice % newValue === 0) {
+          formattedRows.push({startingDice, breakpointToChance});
+        }
+      }
+      formattedRows.sort((a,b) => a.startingDice - b.startingDice);
+      setRows(formattedRows);
     },
     []
   )
@@ -65,7 +71,14 @@ export default function ShouldRollContent() {
       dynamicTyping: true,
       complete: (results: ParseResult<DataRow>) => {
         if (results.errors.length === 0) {
-          data.current = results.data;
+          data.current = new Map();
+          for (const row of results.data) {
+            if (!data.current.has(row.startingDice)) {
+              data.current.set(row.startingDice, new Map());
+            }
+            const breakpointToChance = data.current.get(row.startingDice);
+            breakpointToChance!.set(row.breakpoint, row.chance ? `${(row.chance*100).toFixed(2)}%` : null);
+          }
           handleIntervalChange(intervals[3]);
         }
       },
@@ -81,8 +94,8 @@ export default function ShouldRollContent() {
         <strong className="pb-2 underline">Tip</strong>: 
         During key rotation, you should at least roll until you get 50+ points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
       </p>
-      <p className="text-sm max-w-xl mx-auto">{`'Starting Dice' is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
-      <table className="w-full max-w-xl border-collapse border border-gray-700 mx-auto">
+      <p className="bg-gray-300 dark:bg-gray-900 text-sm max-w-xl ml-0 md:ml-8">{`*Starting Dice is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
+      <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0 md:ml-8">
         <thead>
           <tr className="bg-gray-400 dark:bg-gray-700">
             <th className="pt-1 px-1 text-center">Starting Dice</th>
@@ -103,11 +116,11 @@ export default function ShouldRollContent() {
           {rows.map((row, index) => (
             <tr key={index} className="border-b border-gray-700">
               <td className="px-1 text-center">{row.startingDice}</td>
-              <td className="px-1 text-center">{row.twenty}</td>
-              <td className="px-1 text-center">{row.forty}</td>
-              <td className="px-1 text-center">{row.sixty}</td>
-              <td className="px-1 text-center">{row.eighty}</td>
-              <td className="px-1 text-center">{row.hundred}</td>
+              <td className="px-1 text-center">{row.breakpointToChance.get(20000)}</td>
+              <td className="px-1 text-center">{row.breakpointToChance.get(40000)}</td>
+              <td className="px-1 text-center">{row.breakpointToChance.get(60000)}</td>
+              <td className="px-1 text-center">{row.breakpointToChance.get(80000)}</td>
+              <td className="px-1 text-center">{row.breakpointToChance.get(100000)}</td>
             </tr>
           ))}
         </tbody>

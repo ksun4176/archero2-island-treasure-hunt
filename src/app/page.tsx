@@ -1,11 +1,12 @@
 "use client"
 import MultiplierMapContent from "@/components/MultiplierMapContent";
 import WhereAreDiceContent from "@/components/WhereAreDiceContent";
+import ShouldRollContent from "@/components/ShouldRollContent";
+import PpidCalcContent from "@/components/PpidCalculatorContent";
 import { IconButton } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from '@mui/icons-material/Menu';
 import { JSX, useState } from "react";
-import ShouldRollContent from "@/components/ShouldRollContent";
 
 type Section = {
   href: string;
@@ -37,6 +38,7 @@ const sections: Section[] = [
     href: "ppid-calculator",
     label: "PPID Calculator",
     heading: <>Points per Dice Calculator <span className="whitespace-nowrap">◁ |⚙⌨⚙| ▷</span></>,
+    content: <PpidCalcContent />,
   },
   {
     href: "tips-for-newbies",
@@ -92,7 +94,7 @@ return (
       </Drawer>
       <div className="flex items-start h-full gap-2 py-2 md:px-2">
         {/* Table of Content */}
-        <div className="grow-0 bg-gray-100 dark:bg-gray-800 p-2 rounded sticky top-[40px] hidden md:block">
+        <div className="grow-0 bg-gray-100 dark:bg-gray-800 p-2 rounded sticky top-13 hidden md:block">
           <div className="text-xl font-semibold">Table of content</div>
           <ul className="mt-2 list-disc pr-2 pl-6">
             {sections.map(section => 
@@ -114,7 +116,7 @@ return (
               <div id="container" key={index} className="w-full flex flex-col mb-8">
                 <h2
                   id={section.href}
-                  className="font-semibold text-2xl border-b border-gray-500 mb-1 -mt-[50px] pt-[50px]"
+                  className="font-semibold text-2xl border-b border-gray-500 mb-1 -mt-[50px] pt-[50px] pointer-events-none"
                 >
                   {section.heading}
                 </h2>
