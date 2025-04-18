@@ -141,7 +141,7 @@ export default function FaqContent() {
             >
               Dice Event Tracker
             </a> <br />
-            If you want to help out, DM your run to @fierywind on Discord as we are doing a study on people's runs.<br />
+            {`If you want to help out, DM your run to @fierywind on Discord as we are doing a study on people's runs.`}<br />
             If you have any questions, feel free to reach out to @kaithulhu_ on Discord.<br />
           </p>}
         />
