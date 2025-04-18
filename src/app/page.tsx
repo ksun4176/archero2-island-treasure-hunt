@@ -3,12 +3,14 @@ import MultiplierMapContent from "@/components/MultiplierMapContent";
 import WhereAreDiceContent from "@/components/WhereAreDiceContent";
 import ShouldRollContent from "@/components/ShouldRollContent";
 import PpidCalcContent from "@/components/PpidCalculatorContent";
+import TipsForNewContent from "@/components/TipsForNewContent";
+import FaqContent from "@/components/FaqContent";
 import { IconButton } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from '@mui/icons-material/Menu';
+import Image from "next/image";
 import { JSX, useState } from "react";
-import TipsForNewContent from "@/components/TipsForNewContent";
-import FaqContent from "@/components/FaqContent";
+import { basePath } from "@/utils/constants";
 
 type Section = {
   href: string;
@@ -65,8 +67,8 @@ export default function Home() {
 
 return (
     <div className="flex flex-col min-h-screen font-[family-name:var(--font-geist-sans)]">
-      <div className="flex p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0] z-1">
-        <div className="md:hidden">
+      <div className="flex items-center gap-2 p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0] z-1">
+        <div className="grow-0 md:hidden">
           <IconButton
             size="small"
             aria-label="open sidebar"
@@ -75,7 +77,17 @@ return (
             <MenuIcon />
           </IconButton>
         </div>
-        <h1 className="font-semibold text-3xl">Island Treasure Hunt Guide</h1>
+        <div className="grow-0">
+          <Image
+            className="w-[36px]"
+            src={`${basePath}/diceicon.png`}
+            alt="Island Treasure Hunt"
+            height={177}
+            width={151}
+            unoptimized
+          />
+        </div>
+        <h1 className="font-semibold text-2xl">Island Treasure Hunt</h1>
       </div>
       {/* Sidebar */}
       <Drawer open={sidebarOpen} onClose={toggleSidebar(false)}>

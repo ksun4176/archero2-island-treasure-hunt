@@ -120,7 +120,7 @@ export default function FaqContent() {
               <Image
                 className="min-w-[200px] max-w-[350px]"
                 src={`${basePath}/diceshoprecs.png`}
-                alt="Multiplier Map"
+                alt="Island Store recommendations"
                 height={500}
                 width={370}
                 priority
@@ -129,6 +129,21 @@ export default function FaqContent() {
               <p className="text-sm">Credit to Alyssa</p>
             </div>
           </>}
+        />
+        <Question
+          question="I want to track my run. Is there a tool I can use to do so?"
+          answer={<p>
+            Yes! Here is a Google sheet you can make a copy of and start tracking your run. <br />
+            <a
+              href="https://docs.google.com/spreadsheets/d/1PBUKAoNYW5Pi52tNabO_8t_ePqHUEm1vc96faoi2axo"
+              target="blank_"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Dice Event Tracker
+            </a> <br />
+            If you want to help out, DM your run to @fierywind on Discord as we are doing a study on people's runs.<br />
+            If you have any questions, feel free to reach out to @kaithulhu_ on Discord.<br />
+          </p>}
         />
         <Question
           question="I think I came up with a better multiplier map. Is there an easy way for me to test it out?"
