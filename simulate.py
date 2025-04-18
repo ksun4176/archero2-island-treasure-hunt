@@ -234,10 +234,10 @@ def calc_best_multipliers(board: list[Tile], multiplier: int):
     list[int]: The best multipliers to apply when rolling from each tile of the board
   """
   tile_values: list[tuple[float,float]] = [tile.get_value() for tile in board]
-  #dice value is based on average dice gained per die / (1 - average die gained per die)
+  #dice value = average points gained per die / (1 - average die gained per die)
   dice_value = statistics.fmean([v[0] for v in tile_values]) / (1 - statistics.fmean([v[1] for v in tile_values]))
   # calculated value of tiles in terms of points with NO APPLIED MULTIPLIERS
-  tile_calc_values = [v[0] + v[1]* dice_value for v in tile_values]
+  tile_calc_values = [v[0] + v[1]*dice_value for v in tile_values]
   # get the total point value of each tile based on what tiles can be reached from it
   def get_values(index: int, num_hits: int):
     points = tile_values[index][0] * num_hits / 36
@@ -315,10 +315,10 @@ def calc_best_multipliers(board: list[Tile], multiplier: int):
   for i in range(len(sorted_index)):
     best_multiplier[sorted_index[i]] = multiplier
 
-    # average number of dice gained with multiplier applied
+    # Average Projected Dice Value = Sum(PDVxM) / Sum(Tile Multipliers)
     avg_num_dice = sum([best_multiplier[j] * tile_mult_value[j][1] for j in range(len(best_multiplier))]) / sum(best_multiplier)
-    # PPID is (average points with multiplier applied) / (1 - average number of dice gained with multiplier applied)
-    ppd = sum([best_multiplier[j] * tile_mult_value[j][0] for j in range(len(best_multiplier))]) / sum(best_multiplier) / (1 - avg_num_dice) 
+    # PPID = Sum(Project Points Value of Tile * Tile Multiplier) / Sum(Tile Multipliers) / (1 - Average Projected Dice Value)
+    ppd = sum([best_multiplier[j] * tile_mult_value[j][0] for j in range(len(best_multiplier))]) / sum(best_multiplier) / (1 - avg_num_dice)
     if (ppd < best_ppd):
       best_multiplier[sorted_index[i]] = 1
       break
@@ -540,7 +540,8 @@ sims = [
     5: calc_best_multipliers(board,5),
     10: calc_best_multipliers(board,10)
   }),
-  create_sim_details_same_mult('6x10', [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ])
+  create_sim_details_same_mult('6x10', [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
+  create_sim_details_same_mult('5x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
 ]
 
 # def fiery_sim():
