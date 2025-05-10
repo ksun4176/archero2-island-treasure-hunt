@@ -87,7 +87,10 @@ return (
             unoptimized
           />
         </div>
-        <h1 className="font-semibold text-2xl">Island Treasure Hunt</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:gap-1">
+          <h1 className="font-semibold text-2xl">Island Treasure Hunt</h1>
+          <p className="text-sm">by Kaithulhu</p>
+        </div>
       </div>
       {/* Sidebar */}
       <Drawer open={sidebarOpen} onClose={toggleSidebar(false)}>
