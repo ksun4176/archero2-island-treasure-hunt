@@ -130,6 +130,11 @@ return (
         </div>
         {/* Content */}
         <div className="flex-1 flex flex-col h-full">
+          <div className="text-3xl p-2 bg-gray-100 dark:bg-gray-800 ">
+            {"Down because a single VIP believes sharing information publicly so everyone can compete on equal footing should be punished. And... they have the power to do so.¯\\_(ツ)_/¯"}
+          </div>
+        </div>
+        {/* <div className="flex-1 flex flex-col h-full">
           <div className="p-2 bg-gray-100 dark:bg-gray-800 ">
             {sections.map((section, index) =>
               <div id="container" key={index} className="w-full flex flex-col mb-8">
@@ -143,7 +148,7 @@ return (
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )
