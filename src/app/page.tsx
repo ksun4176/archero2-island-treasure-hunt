@@ -131,7 +131,7 @@ return (
         {/* Content */}
         <div className="flex-1 flex flex-col h-full">
           <div className="text-3xl p-2 bg-gray-100 dark:bg-gray-800 ">
-            {"Down because a single VIP believes sharing information publicly so everyone can compete on equal footing should be punished. And... they have the power to do so.¯\\_(ツ)_/¯"}
+            {"Down until VIP Discord access is given to a few key community helpers to ensure those who contribute and care about the community have a direct line to the developers."}
           </div>
         </div>
         {/* <div className="flex-1 flex flex-col h-full">
