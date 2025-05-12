@@ -65,10 +65,22 @@ export default function FaqContent() {
         />
         <Question
           question="Should I buy the Island Pack 3 for 750 gem?"
-          answer={<p>
-            Based on our PPID calculations, spending 750 gems for 5 dice is a good deal. <br />
-            On average, every 1k points earns you on average 1 key (worth 400 gems), plus you get bonus loot just from rolling around the board.
-          </p>}
+          answer={<>
+            <p className="mb-2">
+              Based on our estimates, this pack is worth <strong><u>at least</u></strong> 1100 gems.
+            </p>
+            <div className="mb-2">
+              <h6 className="underline">Math:</h6>
+              <p>Average for 100k points:</p>
+              <UnorderedList items={[
+                "Number of Dice Needed: 269",
+                "Points Rewards: 55k gems (40k from loot + 10k from mythic artifact + 5k from treasure coin)",
+                "Gems Gotten: 2771.18 gems",
+                "Chroma Keys Gotten: 4.16 keys",
+              ]} />
+              <p>Value of a single dice: (55k gems + 2771.18 gems + 4.16 keys * 400 gems) / 269 dice = <strong>220 gems</strong></p>
+            </div>
+          </>}
         />
         <Question
           question="Why aim for 100k points?"
@@ -109,24 +121,24 @@ export default function FaqContent() {
           answer={<>
             <div className="mb-2">
               <OrderedList items={[
-                `Cupid's Bow: Cheap, costs only 2 tickets (was available for free during Valentine's event)`,
-                `Cupid's Arrow: Completes the set and works across all modes`,
-                `Demon Artifacts: Only used in PVP BUT the mode offers valuable rewards`,
-                `Otta/Epic Char Shards: Based on personal preference, but I recommend Otta, as he is only available in this shop`,
-                `Rare Char Shards: Just avoid them—they are not worth the investment`,
+                `Cupid's Bow: Cheap, costs only 2 tickets (was available for free during Valentine's event).`,
+                `Cupid's Arrow: Completes the set and works across all modes. Worth starring as Dragoon helmet user because of built in burn damage.`,
+                `Demon Artifacts: Only used in PVP BUT the mode offers valuable rewards,`,
+                `Epic Char Shards: A good way to get it f2p (only Seraph and Dracoola though).`,
+                `Otta Shards: Only available in this shop although he is seeing minimum resonance use only in PVP.`,
+                `Rare Char Shards: Just avoid them—they are not worth it.`,
               ]} />
             </div>
             <div>
               <Image
-                className="min-w-[200px] max-w-[350px]"
+                className="w-[350px]"
                 src={`${basePath}/diceshoprecs.png`}
                 alt="Island Store recommendations"
-                height={500}
-                width={370}
+                height={1529}
+                width={1030}
                 priority
                 unoptimized
               />
-              <p className="text-sm">Credit to Alyssa</p>
             </div>
           </>}
         />

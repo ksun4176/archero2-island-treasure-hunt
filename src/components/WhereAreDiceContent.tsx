@@ -62,7 +62,17 @@ const Row = (props: RowProps) => {
   return (
     <div className="flex flex-col gap-y-2 max-w-3xs">
       <div className="flex gap-2">
-        <div className="font-bold flex-1 whitespace-nowrap text-purple-800 dark:text-purple-300">{quest.name}</div>
+        <div className="flex-1 flex gap-1">
+          <div className="font-bold whitespace-nowrap text-purple-800 dark:text-purple-300">{quest.name}</div>
+          <div className="group inline-block">
+            <button className="bg-gray-400 dark:bg-gray-500 px-2 rounded-xl hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105">?</button>
+            <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute max-w-48 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-lg z-10">
+              <p className="px-2 py-1 wrap">
+                {`Breakpoints: ${quest.breakpoints[0].join(', ')}`}
+              </p>
+            </div>
+          </div>
+        </div>
         <div>{`Dice Left: ${numDiceLeft.current}`}</div>
       </div>
       <div className="flex items-center gap-2">

@@ -30,35 +30,35 @@ type Stat = {
 const statsFor100k: Stat[] = [
   {
     label: '# of Starting Dice',
-    stat: 268
+    stat: 269
   },
   {
     label: 'PPID',
-    stat: 391.26
+    stat: 388.91
   },
   {
     label: 'Total Rolls Completed',
-    stat: 498
+    stat: 490
   },
   {
     label: 'PPR',
-    stat: 205.99
+    stat: 209.39
   },
   {
     label: '# of Leftover Dice',
-    stat: 5.68
+    stat: 5.19
   },
   {
     label: 'Gems Gotten',
-    stat: 2480.21
+    stat: 2771.18
   },
   {
     label: 'Chroma Key Gotten',
-    stat: 3.72
+    stat: 4.16
   },
   {
     label: 'Otta Shards Gotten',
-    stat: 0.48
+    stat: 0.53
   }
 ]
 
@@ -118,15 +118,15 @@ export default function MultiplierMapContent() {
       </div>
       <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">
         <Image
-          className="min-w-[200px] max-w-[350px]"
+          className="w-[350px]"
           src={`${basePath}/multipliermap.png`}
           alt="Multiplier Map"
-          height={663}
-          width={436}
+          height={1767}
+          width={1664}
           priority
           unoptimized
         />
-        <p className="text-sm">Credit to Fierywind and Howdy</p>
+        <p className="text-sm">Credit to zaddydaddy and Fierywind</p>
       </div>
     </div>
   );
