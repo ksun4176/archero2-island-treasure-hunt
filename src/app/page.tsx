@@ -129,12 +129,12 @@ return (
           </ul>
         </div>
         {/* Content */}
-        <div className="flex-1 flex flex-col h-full">
+        {/* <div className="flex-1 flex flex-col h-full">
           <div className="text-3xl p-2 bg-gray-100 dark:bg-gray-800 ">
             {"Down until VIP Discord access is given to a few key community helpers to ensure those who contribute and care about the community have a direct line to the developers."}
           </div>
-        </div>
-        {/* <div className="flex-1 flex flex-col h-full">
+        </div> */}
+        <div className="flex-1 flex flex-col h-full">
           <div className="p-2 bg-gray-100 dark:bg-gray-800 ">
             {sections.map((section, index) =>
               <div id="container" key={index} className="w-full flex flex-col mb-8">
@@ -148,7 +148,7 @@ return (
               </div>
             )}
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   )
