@@ -60,7 +60,7 @@ const Row = (props: RowProps) => {
   )
 
   return (
-    <div className="flex flex-col gap-y-2 max-w-3xs">
+    <div className="flex flex-col gap-y-2 max-w-2xs">
       <div className="flex gap-2">
         <div className="flex-1 flex gap-1">
           <div className="font-bold whitespace-nowrap text-purple-800 dark:text-purple-300">{quest.name}</div>
