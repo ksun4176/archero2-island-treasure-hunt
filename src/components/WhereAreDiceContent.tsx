@@ -113,6 +113,11 @@ export default function WhereAreDiceContent() {
     })
   }
 
+  const diceLeft = [...nonRollingTotalDice.values()].reduce((prev, current) => prev + current);
+  const diceEarned = quests
+    .filter(quest => !quest.fromRolling && !quest.optional)
+    .map(quest => quest.breakpoints[1].reduce((prev, current) => prev + current))
+    .reduce((prev, current) => prev + current) - diceLeft;
   return (
     <div>
       <div className="pb-8 ">
@@ -123,8 +128,9 @@ export default function WhereAreDiceContent() {
             <Row key={index} quest={quest} onNumDiceChange={onNumDiceChange}/>
           ))}
         </div>
-        <div className="font-bold text-xl">
-          {`Total: ${[...nonRollingTotalDice.values()].reduce((prev, current) => prev + current)}`}
+        <div className="flex gap-2 font-bold text-xl">
+          <p className="w-[200px]">{`Dice Earned: ${diceEarned}`}</p>
+          <p>{`Dice Left: ${diceLeft}`}</p>
         </div>
       </div>
       <div>

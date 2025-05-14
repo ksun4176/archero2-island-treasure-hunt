@@ -21,16 +21,22 @@ type Section = {
 
 const sections: Section[] = [
   {
-    href: "multiplier-map",
-    label: "Multiplier Map",
-    heading: <>Multiplier Map <span className="whitespace-nowrap">( • ̀ω•́ )✧</span></>,
-    content: <MultiplierMapContent />,
+    href: "tips-for-newbies",
+    label: "Tips for Newbies",
+    heading: <>Tips for Newbies <span className="whitespace-nowrap">◕⩊◕</span></>,
+    content: <TipsForNewContent />,
   },
   {
     href: "where-are-the-dice",
     label: "Where are the dice?!",
     heading: <>Where are the dice?! <span className="whitespace-nowrap">(╯°□°)╯︵ ┻━┻</span></>,
     content: <WhereAreDiceContent />,
+  },
+  {
+    href: "multiplier-map",
+    label: "Multiplier Map",
+    heading: <>Multiplier Map <span className="whitespace-nowrap">( • ̀ω•́ )✧</span></>,
+    content: <MultiplierMapContent />,
   },
   {
     href: "should-i-roll",
@@ -43,12 +49,6 @@ const sections: Section[] = [
     label: "PPID Calculator",
     heading: <>Points per Dice Calculator <span className="whitespace-nowrap">◁ |⚙⌨⚙| ▷</span></>,
     content: <PpidCalcContent />,
-  },
-  {
-    href: "tips-for-newbies",
-    label: "Tips for Newbies",
-    heading: <>Tips for Newbies <span className="whitespace-nowrap">◕⩊◕</span></>,
-    content: <TipsForNewContent />,
   },
   {
     href: "faq",
