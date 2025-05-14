@@ -20,13 +20,14 @@ const ProgressBar = (props: ProgressBarProps) => {
 
 type RowProps = {
   quest: Quest;
-  onNumDiceChange?: (key: string, numDice: number) => void;
+  onNumDiceChange?: (key: string, diceEarned: number, diceLeft: number) => void;
 }
 const Row = (props: RowProps) => {
   const { quest, onNumDiceChange } = props;
   const [includeRow, setIncludeRow] = useState(!quest.optional);
   const [numBreakpointsMet, setNumBreakpointsMet] = useState(0);
-  const numDiceLeft = useRef(quest.breakpoints[1].reduce((prev, current) => prev + current))
+  const totalNumDice = quest.breakpoints[1].reduce((prev, current) => prev + current);
+  const numDiceLeft = useRef(totalNumDice);
 
   const numBreakpoints = quest.breakpoints[0].length;
   const handleCheckboxChange = useCallback(
@@ -35,7 +36,7 @@ const Row = (props: RowProps) => {
       setIncludeRow(isChecked);
 
       if (onNumDiceChange) {
-        onNumDiceChange(quest.name, isChecked ? numDiceLeft.current : 0)
+        onNumDiceChange(quest.name, isChecked ? totalNumDice - numDiceLeft.current : 0, isChecked ? numDiceLeft.current : 0)
       }
     },
     [quest.name, onNumDiceChange]
@@ -53,7 +54,7 @@ const Row = (props: RowProps) => {
       numDiceLeft.current = breakpointsLeft.length === 0 ? 0 : breakpointsLeft.reduce((prev, current) => prev + current);
 
       if (includeRow && onNumDiceChange) {
-        onNumDiceChange(quest.name, numDiceLeft.current);
+        onNumDiceChange(quest.name, totalNumDice - numDiceLeft.current, numDiceLeft.current);
       }
     },
     [includeRow, numBreakpoints, quest, onNumDiceChange]
@@ -99,25 +100,21 @@ const Row = (props: RowProps) => {
 }
 
 export default function WhereAreDiceContent() {
-  const [nonRollingTotalDice, setNonRollingTotalDice] = useState(new Map<string, number>(
+  const [nonRollingDice, setNonRollingDice] = useState(new Map<string, [number,number]>(
     quests
       .filter(quest => !quest.fromRolling && !quest.optional)
-      .map(quest => ([quest.name, quest.breakpoints[1].reduce((prev, current) => prev + current)]))
+      .map(quest => ([quest.name, [0, quest.breakpoints[1].reduce((prev, current) => prev + current)]]))
   ));
 
-  const onNumDiceChange = (key: string, numDice: number) => {
-    setNonRollingTotalDice(oldMap => {
+  const onNumDiceChange = (key: string, diceEarned: number, diceLeft: number) => {
+    setNonRollingDice(oldMap => {
       const newMap = new Map(oldMap);
-      newMap.set(key, numDice);
+      newMap.set(key, [diceEarned, diceLeft]);
       return newMap;
     })
   }
 
-  const diceLeft = [...nonRollingTotalDice.values()].reduce((prev, current) => prev + current);
-  const diceEarned = quests
-    .filter(quest => !quest.fromRolling && !quest.optional)
-    .map(quest => quest.breakpoints[1].reduce((prev, current) => prev + current))
-    .reduce((prev, current) => prev + current) - diceLeft;
+  const totalDice = [...nonRollingDice.values()].reduce((prev, current) => [prev[0] + current[0], prev[1] + current[1]]);
   return (
     <div>
       <div className="pb-8 ">
@@ -129,8 +126,8 @@ export default function WhereAreDiceContent() {
           ))}
         </div>
         <div className="flex gap-2 font-bold text-xl">
-          <p className="w-[200px]">{`Dice Earned: ${diceEarned}`}</p>
-          <p>{`Dice Left: ${diceLeft}`}</p>
+          <p className="w-[200px]">{`Dice Earned: ${totalDice[0]}`}</p>
+          <p>{`Dice Left: ${totalDice[1]}`}</p>
         </div>
       </div>
       <div>
