@@ -1,5 +1,6 @@
 import { basePath } from "@/utils/constants";
 import Image from "next/image";
+import MonopolyMap from '@/components/MonopolyMap';
 
 type Question = {
   question: string;
@@ -116,6 +117,9 @@ export default function MultiplierMapContent() {
           </tbody>
         </table>
       </div>
+
+      <MonopolyMap></MonopolyMap>
+
       <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">
         <Image
           className="w-[350px]"
