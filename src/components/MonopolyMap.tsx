@@ -1,7 +1,6 @@
-import { useState } from "react";
 import Image from "next/image";
 import { basePath } from "@/utils/constants";
-import styles from "./MonopolyMap.module.css";
+import styles from "./styles/MonopolyMap.module.css";
 
 const tiles = [
     { left: 149, top: 88, pos: 14 },
@@ -25,50 +24,54 @@ const tiles = [
     { left: 227, top: 214, pos: 21 },
     { left: 253, top: 232, pos: 22 },
     { left: 227, top: 250, pos: 23 },
-    { left: 201, top: 268, pos: 24 },
+    { left: 201, top: 268, pos: 0 },
     { left: 175, top: 286, pos: 1 },
     { left: 149, top: 304, pos: 2 },
 ];
 
-export default function MonopolyMap({ multipliers }: { multipliers: number[] }) {
-    return (
-        <div className="relative w-[350px] h-[370px] mx-auto lg:ml-4 mb-4 lg:mb-0">
-            <Image
-                src={`${basePath}/tiles/bg-monopoly.png`}
-                alt="Monopoly Map Background"
-                fill
-                className="object-contain"
-                priority
-                unoptimized
-            />
+type MonopolyMapProps = {
+  multipliers: number[],
+}
+export default function MonopolyMap(props : MonopolyMapProps) {
+  const { multipliers } = props;
+  return (
+    <div className="relative w-[350px] h-[370px]">
+      <Image
+        src={`${basePath}/tiles/bg-monopoly.png`}
+        alt="Monopoly Map Background"
+        fill
+        className="object-contain"
+        priority
+        unoptimized
+      />
 
-            {tiles.map((tile, i) => {
-                const multiplier = multipliers?.[tile.pos - 1]; // tile.pos is 1-based
-                return (
-                    <div
-                        key={i}
-                        className={styles.tile}
-                        style={{ left: `${tile.left}px`, top: `${tile.top}px` }}
-                    >
-                        <Image
-                            src={`${basePath}/tiles/tile_${multiplier || 1}.png`}
-                            alt={`Tile ${tile.pos}`}
-                            width={46}
-                            height={46}
-                            unoptimized
-                            className={styles.imageTile}
-                        />
-                        <Image
-                            src={`${basePath}/tiles/shine.png`}
-                            alt="Shine"
-                            width={46}
-                            height={46}
-                            unoptimized
-                            className={styles.shine}
-                        />
-                    </div>
-                );
-            })}
-        </div>
-    );
+      {tiles.map((tile) => {
+          const multiplier = multipliers.length > tile.pos ? multipliers[tile.pos] : 1;
+          return (
+            <div
+              key={tile.pos}
+              className={styles.tile}
+              style={{ left: `${tile.left}px`, top: `${tile.top}px` }}
+            >
+              <Image
+                src={`${basePath}/tiles/tile_x${multiplier}.png`}
+                alt={`Tile ${tile.pos}`}
+                width={46}
+                height={46}
+                unoptimized
+                className={styles.imageTile}
+              />
+              {/* <Image
+                src={`${basePath}/tiles/shine.png`}
+                alt="Shine"
+                width={46}
+                height={46}
+                unoptimized
+                className={styles.shine}
+              /> */}
+            </div>
+          );
+      })}
+    </div>
+  );
 }
