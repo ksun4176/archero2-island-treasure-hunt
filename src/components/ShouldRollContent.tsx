@@ -95,7 +95,7 @@ export default function ShouldRollContent() {
         During key rotation, you should at least roll until you get 50+ points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
       </p>
       <p className="bg-gray-300 dark:bg-gray-900 text-sm max-w-xl ml-0">{`*Start Dice is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
-      <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0">
+      <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0 mb-4">
         <thead>
           <tr className="bg-gray-400 dark:bg-gray-700">
             <th className="pt-1 px-1 text-center">Start Dice</th>
@@ -125,6 +125,17 @@ export default function ShouldRollContent() {
           ))}
         </tbody>
       </table>
+      <p>
+        If you already started to roll and you want to check what are your chances of reaching your goal, you can use this tool to do so:<br />
+        <a
+          href="https://colab.research.google.com/drive/1x8mFXpWvPb4AE8RDYL41t4E9LpIjw500#scrollTo=KsMj1AP8BLmS"
+          target="blank_"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Success Rate Tool
+        </a> <br />
+        If you have any questions, feel free to reach out to @kaithulhu_ on Discord. <br />
+      </p>
     </div>
   )
 }

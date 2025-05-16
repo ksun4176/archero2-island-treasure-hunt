@@ -162,11 +162,11 @@ export default function FaqContent() {
           answer={<p>
             Yes! You can run the same Python script to simulate the event, where you can test out your new map: <br />
             <a
-              href="https://github.com/ksun4176/archero2-island-treasure-hunt-sim"
+              href="https://colab.research.google.com/drive/1x8mFXpWvPb4AE8RDYL41t4E9LpIjw500#scrollTo=KsMj1AP8BLmS"
               target="blank_"
               className="text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Simulation Github Repo
+              Multiplier Map Tester
             </a> <br />
             If you have any questions, feel free to reach out to @kaithulhu_ on Discord. <br />
           </p>}
