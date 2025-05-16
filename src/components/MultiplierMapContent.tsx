@@ -118,20 +118,21 @@ export default function MultiplierMapContent() {
         </table>
       </div>
 
-      <MonopolyMap></MonopolyMap>
+      <MonopolyMap multipliers={[1,1,1,1,1,1,1,10,10,1,1,1,1,1,1,1,1,1,1,10,10,10,1,1]} />
+      {/*<MonopolyMap multipliers={[1,2,3,5,10,5,3,2,1,2,3,5,10,5,3,2,1,2,3,5,10,5,3,2]} />*/}
 
-      <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">
-        <Image
-          className="w-[350px]"
-          src={`${basePath}/multipliermap.png`}
-          alt="Multiplier Map"
-          height={1767}
-          width={1664}
-          priority
-          unoptimized
-        />
-        <p className="text-sm">Credit to zaddydaddy and Fierywind</p>
-      </div>
+      {/*<div className="mx-auto lg:ml-4 mb-4 lg:mb-0">*/}
+      {/*  <Image*/}
+      {/*    className="w-[350px]"*/}
+      {/*    src={`${basePath}/multipliermap.png`}*/}
+      {/*    alt="Multiplier Map"*/}
+      {/*    height={1767}*/}
+      {/*    width={1664}*/}
+      {/*    priority*/}
+      {/*    unoptimized*/}
+      {/*  />*/}
+      {/*  <p className="text-sm">Credit to zaddydaddy and Fierywind</p>*/}
+      {/*</div>*/}
     </div>
   );
 }
