@@ -146,3 +146,7 @@ export const quests: Quest[] = [
     fromRolling: true,
   },
 ]
+
+export enum LinkId {
+  ppid = 'ppid-def'
+}

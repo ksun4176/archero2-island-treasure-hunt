@@ -5,7 +5,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IntegerInput } from "./IntegerInput";
 import { usePapaParse } from "react-papaparse";
-import { basePath, QuestNames, quests } from "@/utils/constants";
+import { basePath, LinkId, QuestNames, quests } from "@/utils/constants";
 import { ParseResult } from "papaparse";
 import { DataRow } from "@/utils/types";
 
@@ -142,7 +142,7 @@ export default function PpidCalculatorContent() {
       const startingDice = startingDiceIntervals.find(sd => result.numDice! <= sd);
 
       const chance = data.current.find(d => d.breakpoint === breakpoint && d.startingDice === startingDice)?.chance;
-      result.percentile = !chance ? "???" : `${(chance*100).toFixed(2)}%`;
+      result.percentile = !chance ? "???" : `${((1-chance)*100).toFixed(2)}%`;
     }
     setResult(result);
   }
@@ -162,7 +162,7 @@ export default function PpidCalculatorContent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p>Use this calculator to see how your run compares to others.</p>
+      <p>Use this to calculate your <a href={`#${LinkId.ppid}`} className="text-blue-600 dark:text-blue-400 hover:underline">PPID</a> to see how your run compares to others.</p>
       <div className="flex flex-col gap-1">
         <div className="flex gap-1">
           <p>How many points did you get this run?</p>
@@ -227,7 +227,7 @@ export default function PpidCalculatorContent() {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex gap-1">
-            <p>How many dice you have left after rolling?</p>
+            <p>{`How many dice you have left after rolling? (Collect all tasks and rewards first)`}</p>
             <div className="group inline-block">
               <button className="bg-gray-400 dark:bg-gray-500 px-2 rounded-xl hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105">?</button>
               <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute max-w-48 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-lg z-10">
@@ -261,7 +261,7 @@ export default function PpidCalculatorContent() {
           <div className="group inline-block">
             <button className="bg-gray-400 dark:bg-gray-500 px-2 rounded-xl hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105">?</button>
             <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute max-w-48 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-lg z-10">
-              <p className="px-2 py-1">{`This percentile lets you know how your run compared to others. The lower the percentile, the luckier you were.`}</p>
+              <p className="px-2 py-1">{`This percentile lets you know how your run compared to others. The higher the percentile, the luckier you were.`}</p>
             </div>
           </div>
         </div>}

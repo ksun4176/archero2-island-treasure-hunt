@@ -1,14 +1,15 @@
-import { basePath } from "@/utils/constants";
+import { basePath, LinkId } from "@/utils/constants";
 import Image from "next/image";
 import React from "react";
 
 type QuestionProps = {
   question: string;
   answer?: React.ReactNode;
+  id?: string;
 }
 const Question = (props: QuestionProps) => {
-  const { question, answer } = props;
-  return <div className="py-8 lg:grid lg:grid-cols-4 lg:gap-8">
+  const { id, question, answer } = props;
+  return <div id={id} className="py-8 lg:grid lg:grid-cols-4 lg:gap-8">
     <dt className="font-semibold">{question}</dt>
     <dd className="lg:col-span-3 mt-4 lg:mt-0 *:text-gray-900 *:dark:text-gray-300">{answer}</dd>
   </div>
@@ -35,6 +36,7 @@ export default function FaqContent() {
     <div>
       <dl className="divide-y divide-gray-900/10">
         <Question
+          id={LinkId.ppid}
           question="What is Points per Dice (PPID)?"
           answer={<>
             <p className="mb-2 pl-2 -indent-2">
@@ -83,7 +85,7 @@ export default function FaqContent() {
           </>}
         />
         <Question
-          question="Why aim for 100k points?"
+          question="Why aim for 100k points? Should we roll more if we have more dice?"
           answer={<>
             <div className="mb-2">
               <p>Hitting 100k points strikes the best balance between breakpoint rewards AND ranking rewards.</p>
@@ -92,9 +94,14 @@ export default function FaqContent() {
                 <>Hitting 100k twice <strong><u>instead</u></strong> of 200k once earns you ~10 more artifact shards, at the cost of only ~2 treasure coins.</>,
               ]} />
             </div>
-            <p>
-              <strong><u>Caveat:</u></strong> It might be worth spending a little bit extra dice to get higher rank rewards but that is up to you.
-            </p>
+            <div>
+              <p>Now whether it is worth spending extra dice to go past 100k is totally up to you—but here are a few things to think about:</p>
+              <UnorderedList items={[
+                "Will you still have enough dice to roll comfortably next time you want to play?",
+                "Can you hit the next 10k milestone? This guarantees you another treasure coin and 10 chromatic keys.",
+                "Any little gains such as aiming for the next reward tier will have to be based on your gut feel. Good luck!"
+              ]} />
+            </div>
           </>}
         />
         <Question

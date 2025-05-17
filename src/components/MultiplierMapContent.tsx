@@ -1,4 +1,6 @@
 import MonopolyMap from '@/components/MonopolyMap';
+import { LinkId } from '@/utils/constants';
+import { ReactNode } from 'react';
 
 type Question = {
   question: string;
@@ -23,8 +25,8 @@ const OrderedList = (props: OrderedListProps) => {
 }
 
 type Stat = {
-  label: string;
-  stat: number;
+  label: ReactNode;
+  stat: ReactNode;
 }
 const statsFor100k: Stat[] = [
   {
@@ -32,7 +34,12 @@ const statsFor100k: Stat[] = [
     stat: 269
   },
   {
-    label: 'PPID',
+    label: <a
+      href={`#${LinkId.ppid}`}
+      className="text-blue-600 dark:text-blue-400 hover:underline"
+    >
+      PPID
+    </a>,
     stat: 388.91
   },
   {
@@ -65,7 +72,7 @@ export default function MultiplierMapContent() {
   return (
     <div id="container" className="w-full flex flex-col-reverse lg:flex-row">
       <div className="flex-1">
-        <div className="mb-2">
+        <div className="mb-4">
           <Question text="How do I use this map?" />
           <div>
             <OrderedList items={[
@@ -77,7 +84,22 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <div className="mb-2">
+        <div className="mb-4">
+          <Question text="What is the benefit of this map?" />
+          <div>
+            <p>{`
+              This map is not the most efficient one to get to 100k (it requires 0.25 dice more), but in return, you get on average 0.4 extra chromatic keys and 280 gems.
+              For us, that small tradeoff is totally worth it.
+            `}</p>
+            <p>{`
+              Now you might be thinking—are there maps that use more dice but give even bigger rewards?
+              Yep, there are. But we still think this one's the best overall.
+              Dice are super important since they are the only way to get treasure coins and grab those exclusive Island Store loot.
+              We do not want people using a bunch of extra dice in one go and then not having enough saved up for the next run.
+            `}</p>
+          </div>
+        </div>
+        <div className="mb-4">
           <Question text="How did we come up with this map?" />
           <div>
             <OrderedList items={[
@@ -89,7 +111,7 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <div className="mb-2">
+        <div className="mb-4">
           <Question text="Did we try other maps?" />
           <div>
             <OrderedList items={[
