@@ -127,13 +127,15 @@ export default function FaqContent() {
           question="What should I buy in the exchange shop?"
           answer={<>
             <div className="mb-2">
-              <OrderedList items={[
-                `Cupid's Bow: Cheap, costs only 2 tickets (was available for free during Valentine's event).`,
-                `Cupid's Arrow: Completes the set and works across all modes. Worth starring as Dragoon helmet user because of built in burn damage.`,
-                `Demon Artifacts: Only used in PVP BUT the mode offers valuable rewards,`,
-                `Epic Char Shards: A good way to get it f2p (only Seraph and Dracoola though).`,
-                `Otta Shards: Only available in this shop although he is seeing minimum resonance use only in PVP.`,
-                `Rare Char Shards: Just avoid them—they are not worth it.`,
+              <UnorderedList items={[
+                <><strong>Cupid's Bow</strong>: Cheap, cost only 2 tickets.</>,
+                <><strong>Cupid's Arrow</strong>: Completes the set and works across all modes. Worth considering getting stars as a Dragoon Helmet user.</>,
+                <><strong>Thronebreaker Shield (PVP only)</strong>: Cheap, cost only 2 tickets.</>,
+                <><strong>Demon Artifacts (PVP only)</strong>: Good effects.</>,
+                <><strong>Otta</strong>: 2-star is when he starts to shine in PVP and possibly Boss Battles. Only available in this shop and unfortunately requires a longgg-term commitment (200 shards).</>,
+                <><strong>Battle Rite Artifacts (PVP only)</strong>: Worse effect than Demons and has a meh set bonus.</>,
+                <><strong>Epic Characters</strong>: A good way to get it although pricey (only Seraph and Dracoola though).</>,
+                <><strong>Rare Characters</strong>: Just don't.</>,
               ]} />
             </div>
             <div>
