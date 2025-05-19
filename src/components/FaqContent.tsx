@@ -18,12 +18,6 @@ const Question = (props: QuestionProps) => {
 type ListProps = {
   items: React.ReactNode[];
 }
-const OrderedList = (props: ListProps) => {
-  const { items } = props;
-  return <ol className="list-decimal ms-5 flex flex-col gap-1">
-    {items.map((item, index) => <li key={index}>{item}</li>)}
-  </ol>
-}
 const UnorderedList = (props: ListProps) => {
   const { items } = props;
   return <ol className="list-disc ms-5 flex flex-col gap-1">

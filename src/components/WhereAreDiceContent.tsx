@@ -26,8 +26,7 @@ const Row = (props: RowProps) => {
   const { quest, onNumDiceChange } = props;
   const [includeRow, setIncludeRow] = useState(!quest.optional);
   const [numBreakpointsMet, setNumBreakpointsMet] = useState(0);
-  const totalNumDice = quest.breakpoints[1].reduce((prev, current) => prev + current);
-  const numDiceLeft = useRef(totalNumDice);
+  const numDiceLeft = useRef(quest.breakpoints[1].reduce((prev, current) => prev + current));
 
   const numBreakpoints = quest.breakpoints[0].length;
   const handleCheckboxChange = useCallback(
@@ -36,6 +35,7 @@ const Row = (props: RowProps) => {
       setIncludeRow(isChecked);
 
       if (onNumDiceChange) {
+        const totalNumDice = quest.breakpoints[1].reduce((prev, current) => prev + current);
         onNumDiceChange(quest.name, isChecked ? totalNumDice - numDiceLeft.current : 0, isChecked ? numDiceLeft.current : 0)
       }
     },
@@ -54,6 +54,7 @@ const Row = (props: RowProps) => {
       numDiceLeft.current = breakpointsLeft.length === 0 ? 0 : breakpointsLeft.reduce((prev, current) => prev + current);
 
       if (includeRow && onNumDiceChange) {
+        const totalNumDice = quest.breakpoints[1].reduce((prev, current) => prev + current);
         onNumDiceChange(quest.name, totalNumDice - numDiceLeft.current, numDiceLeft.current);
       }
     },
