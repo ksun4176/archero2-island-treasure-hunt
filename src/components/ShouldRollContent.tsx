@@ -3,7 +3,12 @@ import { ParseResult } from 'papaparse';
 import { usePapaParse } from 'react-papaparse';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { basePath } from '@/utils/constants';
-import { DataRow } from '@/utils/types';
+
+type DataRow = {
+  startingDice: number;
+  breakpoint: number;
+  chance: number | null;
+}
 
 const intervals = [5,10,20,25, 50, 100];
 type IntervalSelectProps = {

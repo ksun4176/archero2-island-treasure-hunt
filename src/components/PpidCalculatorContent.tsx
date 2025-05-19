@@ -7,7 +7,10 @@ import { IntegerInput } from "./IntegerInput";
 import { usePapaParse } from "react-papaparse";
 import { basePath, LinkId, QuestNames, quests } from "@/utils/constants";
 import { ParseResult } from "papaparse";
-import { DataRow } from "@/utils/types";
+
+type DataRow = {
+  ppid: number;
+}
 
 type Values = {
   points?: number;
@@ -20,7 +23,7 @@ type Values = {
 type Result = {
   error?: string;
   numDice?: number;
-  ppid?: string;
+  ppid?: number;
   percentile?: string;
 }
 
@@ -123,32 +126,24 @@ export default function PpidCalculatorContent() {
       }
     }
 
-    if (result.numDice) {
-      result.ppid = result.numDice > 0 ? 
-          (values.current.points! / result.numDice).toFixed(2) + "" :
-          "Infinite";
+    if (typeof(result.numDice) === "number") {
+      result.ppid = result.numDice <= 0 ? Infinity : Math.round(values.current.points! / result.numDice * 100) / 100;
     }
 
-    if (result.ppid === "Infinite") {
-      result.percentile = "???"
-    }
-    else if (result.ppid) {
-      const breakpoints = [...new Set(data.current.map(d => d.breakpoint))];
-      breakpoints.sort((a,b) => b - a);
-      const startingDiceIntervals = [...new Set(data.current.map(d => d.startingDice))];
-      startingDiceIntervals.sort((a,b) => a - b);
-      
-      const breakpoint = breakpoints.find(bp => values.current.points! >= bp);
-      const startingDice = startingDiceIntervals.find(sd => result.numDice! <= sd);
-
-      const chance = data.current.find(d => d.breakpoint === breakpoint && d.startingDice === startingDice)?.chance;
-      result.percentile = !chance ? "???" : `${((1-chance)*100).toFixed(2)}%`;
+    if (result.ppid) {
+      const totalDataPoints = data.current.length;
+      let foundIndex = data.current.findLastIndex(value => value.ppid <= result.ppid!);
+      // set PPID to always be over 0
+      if (foundIndex <= 0) {
+        foundIndex = 1;
+      }
+      result.percentile = `${(foundIndex/totalDataPoints*100).toFixed(2)}%`;
     }
     setResult(result);
   }
 
   useEffect(() => {
-    readRemoteFile(`${basePath}/data.csv`, {
+    readRemoteFile(`${basePath}/ppid_data.csv`, {
       download: true,
       header: true,
       dynamicTyping: true,
@@ -250,7 +245,7 @@ export default function PpidCalculatorContent() {
         {values.current.points && <div>
           Number of points: {values.current.points}
         </div>}
-        {result.numDice && <div>
+        {typeof(result.numDice) === "number" && <div>
           Number of Dice Used: {result.numDice}
         </div>}
         {result.ppid && <div>
