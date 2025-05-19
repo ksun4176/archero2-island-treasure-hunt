@@ -56,16 +56,16 @@ export default function MonopolyMap(props : MonopolyMapProps) {
               <Image
                 src={`${basePath}/tiles/tile_x${multiplier}.png`}
                 alt={`Tile ${tile.pos}`}
-                width={46}
-                height={46}
+                width={152}
+                height={180}
                 unoptimized
                 className={styles.imageTile}
               />
               {/* <Image
                 src={`${basePath}/tiles/shine.png`}
                 alt="Shine"
-                width={46}
-                height={46}
+                width={152}
+                height={180}
                 unoptimized
                 className={styles.shine}
               /> */}
