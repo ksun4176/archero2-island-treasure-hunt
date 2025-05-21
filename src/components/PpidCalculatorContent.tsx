@@ -208,13 +208,7 @@ export default function PpidCalculatorContent() {
       {knowDiceFromBoard === false && <>
         <div className="flex flex-col gap-1">
           <div className="flex gap-1">
-            <p>How many dice did you start rolling with?</p>
-            <div className="group inline-block">
-              <button className="bg-gray-400 dark:bg-gray-500 px-2 rounded-xl hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105">?</button>
-              <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute max-w-48 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-lg z-10">
-                <p className="px-2 py-1">{`The number of dice you had BEFORE you did any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
-              </div>
-            </div>
+            <p>{`How many dice did you start rolling with? This is the number BEFORE you did any rolling BUT after you have collected all other tasks and rewards.`}</p>
           </div>
           <div className="w-[120px]">
             <IntegerInput name="startDiceInput" onValueChange={onStartDiceChange} />
@@ -222,13 +216,7 @@ export default function PpidCalculatorContent() {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex gap-1">
-            <p>{`How many dice you have left after rolling? (Collect all tasks and rewards first)`}</p>
-            <div className="group inline-block">
-              <button className="bg-gray-400 dark:bg-gray-500 px-2 rounded-xl hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105">?</button>
-              <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute max-w-48 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-lg z-10">
-                <p className="px-2 py-1">{`The number of dice you have at the end after collecting all tasks and rewards.`}</p>
-              </div>
-            </div>
+            <p>{`How many dice do you have left after rolling? This is the number AFTER you finished rolling AND collected all rolling tasks and rewards.`}</p>
           </div>
           <div className="w-[120px]">
             <IntegerInput name="endDiceInput" onValueChange={onEndDiceChange} />

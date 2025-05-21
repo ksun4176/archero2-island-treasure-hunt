@@ -67,7 +67,7 @@ export default function Home() {
 
 return (
     <div className="flex flex-col min-h-screen font-[family-name:var(--font-geist-sans)]">
-      <div className="flex items-center gap-2 p-2 bg-gray-300 dark:bg-gray-600 sticky top-[0] z-1">
+      <div className="flex items-center gap-2 p-2 bg-gray-300 dark:bg-gray-600 sticky top-0 z-1">
         <div className="grow-0 md:hidden">
           <IconButton
             size="small"
@@ -87,9 +87,21 @@ return (
             unoptimized
           />
         </div>
-        <div className="flex flex-col md:flex-row md:items-center md:gap-1">
+        <div className="flex-1 flex flex-col md:flex-row md:items-center md:gap-1">
           <h1 className="font-semibold text-2xl">Island Treasure Hunt</h1>
           <p className="text-sm">by Kaithulhu</p>
+        </div>
+        <div className="hidden md:block">
+          <a href='https://ko-fi.com/O4O71FBM0I' target='_blank'>
+            <img
+              height='36px'
+              style={{
+                border: '0px',
+                height: '36px'
+              }}
+              src='https://storage.ko-fi.com/cdn/kofi5.png?v=6'
+              alt='Buy Me a Coffee at ko-fi.com' />
+          </a>
         </div>
       </div>
       {/* Sidebar */}
@@ -149,6 +161,19 @@ return (
             )}
           </div>
         </div>
+      </div>
+      {/* Footer */}
+      <div className="flex justify-end p-2 block md:hidden sticky bottom-0">
+        <a href='https://ko-fi.com/O4O71FBM0I' target='_blank'>
+          <img
+            height='36px'
+            style={{
+              border: '0px',
+              height: '36px'
+            }}
+            src='https://storage.ko-fi.com/cdn/kofi5.png?v=6'
+            alt='Buy Me a Coffee at ko-fi.com' />
+        </a>
       </div>
     </div>
   )
