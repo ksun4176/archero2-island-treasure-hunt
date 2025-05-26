@@ -5,7 +5,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IntegerInput } from "./IntegerInput";
 import { usePapaParse } from "react-papaparse";
-import { basePath, LinkId, QuestNames, quests } from "@/utils/constants";
+import { basePath, LinkId, QuestNames, quests, Rotations } from "@/utils/constants";
 import { ParseResult } from "papaparse";
 
 type DataRow = {
@@ -93,8 +93,10 @@ export default function PpidCalculatorContent() {
       }
       else {
         let diceFromQuests = 0;
-        const gettingPointsQuest = quests.find(q => q.name === QuestNames.GettingPoints);
-        const rollDiceQuest = quests.find(q => q.name === QuestNames.RollDice);
+        // going to use key quests since that's the one that matters
+        const rotationQuests = quests.get(Rotations.Keys)!;
+        const gettingPointsQuest = rotationQuests.find(q => q.name === QuestNames.GettingPoints);
+        const rollDiceQuest = rotationQuests.find(q => q.name === QuestNames.RollDice);
         if (gettingPointsQuest) {
           for (let i = 0; i < gettingPointsQuest.breakpoints[0].length; i++) {
             const bp = gettingPointsQuest.breakpoints[0][i];
