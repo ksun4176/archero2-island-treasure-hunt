@@ -136,7 +136,7 @@ export default function WhereAreDiceContent() {
             </Select>
           </FormControl>
         </div>
-        {rotationQuests && <>
+        {rotationQuests?.length > 0 && <>
           <h3 className="text-lg font-semibold">Quests that you can complete without rolling</h3>
           <p className="pb-2">{`These quests affects your Points per Initial Dice (PPID) as it adds to your '# of Starting Dice'.`}</p>
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-x-2 gap-y-4 border-b border-dashed border-gray-600 pb-2">
