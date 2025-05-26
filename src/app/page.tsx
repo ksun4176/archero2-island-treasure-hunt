@@ -93,14 +93,14 @@ return (
         </div>
         <div className="hidden md:block">
           <a href='https://ko-fi.com/O4O71FBM0I' target='_blank'>
-            <img
-              height='36px'
-              style={{
-                border: '0px',
-                height: '36px'
-              }}
+            <Image
+              height={36}
+              width={143}
+              className="h-[36px] w-[143px] border-0"
               src='https://storage.ko-fi.com/cdn/kofi5.png?v=6'
-              alt='Buy Me a Coffee at ko-fi.com' />
+              alt='Buy Me a Coffee at ko-fi.com'
+              unoptimized
+            />
           </a>
         </div>
       </div>
@@ -165,14 +165,14 @@ return (
       {/* Footer */}
       <div className="flex justify-end p-2 block md:hidden sticky bottom-0">
         <a href='https://ko-fi.com/O4O71FBM0I' target='_blank'>
-          <img
-            height='36px'
-            style={{
-              border: '0px',
-              height: '36px'
-            }}
+          <Image
+            height={36}
+            width={143}
+            className="h-[36px] w-[143px] border-0"
             src='https://storage.ko-fi.com/cdn/kofi5.png?v=6'
-            alt='Buy Me a Coffee at ko-fi.com' />
+            alt='Buy Me a Coffee at ko-fi.com'
+            unoptimized
+          />
         </a>
       </div>
     </div>

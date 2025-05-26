@@ -3,5 +3,4 @@ export type Quest = {
   breakpoints: [number[],number[]];
   placeholderText: string;
   fromRolling?: boolean;
-  optional?: boolean;
 }

@@ -67,6 +67,45 @@ const statsFor100k: Stat[] = [
     stat: 0.53
   }
 ]
+const statsForNoStrat: Stat[] = [
+  {
+    label: '# of Starting Dice',
+    stat: 309
+  },
+  {
+    label: <a
+      href={`#${LinkId.ppid}`}
+      className="text-blue-600 dark:text-blue-400 hover:underline"
+    >
+      PPID
+    </a>,
+    stat: 327.96
+  },
+  {
+    label: 'Total Rolls Completed',
+    stat: 524
+  },
+  {
+    label: 'PPR',
+    stat: 191.39
+  },
+  {
+    label: '# of Leftover Dice',
+    stat: 2.33
+  },
+  {
+    label: 'Gems Gotten',
+    stat: 2768.85
+  },
+  {
+    label: 'Chroma Key Gotten',
+    stat: 5.90
+  },
+  {
+    label: 'Otta Shards Gotten',
+    stat: 1.31
+  }
+]
 
 export default function MultiplierMapContent() {
   return (
@@ -121,21 +160,38 @@ export default function MultiplierMapContent() {
             />
           </div>
         </div>
-        <table className="w-full border-collapse border border-gray-700 max-w-3xs mx-auto lg:ml-0">
-          <thead>
-            <tr className="bg-gray-400 dark:bg-gray-700">
-              <th className="p-1 text-center" colSpan={2}>Average for 100k points</th>
-            </tr>
-          </thead>
-          <tbody>
-            {statsFor100k.map((stat, index) => (
-              <tr key={index} className="border-b border-gray-700">
-                <td className="p-1">{stat.label}</td>
-                <td className="p-1">{stat.stat}</td>
+        <div className="flex gap-4 justify-start">
+          <table className="border-collapse border border-gray-700 max-w-3xs">
+            <thead>
+              <tr className="bg-gray-400 dark:bg-gray-700">
+                <th className="p-1 text-center" colSpan={2}>5x10 Averages</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {statsFor100k.map((stat, index) => (
+                <tr key={index} className="border-b border-gray-700">
+                  <td className="p-1">{stat.label}</td>
+                  <td className="p-1">{stat.stat}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <table className="border-collapse border border-gray-700 max-w-3xs">
+            <thead>
+              <tr className="bg-gray-400 dark:bg-gray-700">
+                <th className="p-1 text-center" colSpan={2}>No Strategy Averages</th>
+              </tr>
+            </thead>
+            <tbody>
+              {statsForNoStrat.map((stat, index) => (
+                <tr key={index} className="border-b border-gray-700">
+                  <td className="p-1">{stat.label}</td>
+                  <td className="p-1">{stat.stat}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="mx-auto lg:ml-4 mb-4 lg:mb-0">

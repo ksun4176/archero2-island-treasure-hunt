@@ -82,7 +82,7 @@ export default function FaqContent() {
           question="Why aim for 100k points? Should we roll more if we have more dice?"
           answer={<>
             <div className="mb-2">
-              <p>Hitting 100k points strikes the best balance between breakpoint rewards AND ranking rewards.</p>
+              <p>Hitting 100k points strikes the best balance between breakpoint rewards AND ranking rewards. It also rounds you out to 10 artifact shards, the amount needed to actually unlock it.</p>
               <UnorderedList items={[
                 <>Going straight for 100k (while skipping events) <strong><u>instead</u></strong> of aiming for 20k every time gives you ~3 more treasure coins, plus extra treasure coins from better rankings.</>,
                 <>Hitting 100k twice <strong><u>instead</u></strong> of 200k once earns you ~10 more artifact shards, at the cost of only ~2 treasure coins.</>,
@@ -130,6 +130,7 @@ export default function FaqContent() {
                 <><strong>{`Battle Rite Artifacts (PVP only)`}</strong>{`: Worse effect than Demons and has a meh set bonus.`}</>,
                 <><strong>{`Epic Characters`}</strong>{`: A good way to get it although pricey (only Seraph and Dracoola though).`}</>,
                 <><strong>{`Rare Characters`}</strong>{`: Just don't.`}</>,
+                <><strong>{`If no good options, you should save as they are adding more loot to the store`}</strong></>,
               ]} />
             </div>
             <div>
