@@ -97,7 +97,7 @@ export default function ShouldRollContent() {
         You can save dice between events to have a better chance of hitting your points goal. <br />
         The table below shows you the chance of reaching that points goal based on how many dice you started with. <br />
         <strong className="pb-2 underline">Tip</strong>: 
-        During key rotation, you should at least roll until you get 50+ points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
+        Every event, you should roll until you get some points. This will assign you the lowest rank of 1001+ which still gives one free Chroma Key.
       </p>
       <p className="bg-gray-300 dark:bg-gray-900 text-sm max-w-xl ml-0">{`*Start Dice is the amount of dice you have BEFORE you do any rolling. Go to the 'Where are the dice?!' section to see which quests impact this.`}</p>
       <table className="w-full max-w-xl border-collapse border border-gray-700 ml-0 mb-4">
