@@ -18,6 +18,13 @@ const Question = (props: QuestionProps) => {
 type ListProps = {
   items: React.ReactNode[];
 }
+const OrderedList = (props: ListProps) => {
+  const { items } = props;
+  return <ol className="list-decimal ms-5 flex flex-col gap-1">
+    {items.map((item, index) => <li key={index}>{item}</li>)}
+  </ol>
+}
+
 const UnorderedList = (props: ListProps) => {
   const { items } = props;
   return <ol className="list-disc ms-5 flex flex-col gap-1">
@@ -103,18 +110,15 @@ export default function FaqContent() {
           answer={<>
             <div className="mb-2">
               <p>
-                Each event rotation focuses on a single resource for the week. You can use that resource to get more dice AND you can roll dice to earn more of that resource. Each rotation also includes a matching artifact as a reward. <br/>
-                The event rotations are: <br/>
+                Each event rotation focuses on a single artifact for the week. You can collect shards for that artifact as you meet points milestones. The artifacts rotate between Goldfinger, Golden Fleece, and Golden Mask.<br/>
+                We recommend: <br/>
               </p>
-              <UnorderedList items={[
-                "Chroma Keys and Goldfinger Artifact",
-                "Wishes and Golden Fleece Artifact",
-                "Shovels and Golden Mask Artifact"
+              <OrderedList items={[
+                "prioritizing getting one of each of the three artifacts first to complete the set bonus",
+                "shift focus to get Goldfinger to 8 stars",
+                "move to collect star up the other two artifacts equally"
               ]} />
             </div>
-            <p>
-              We recommend prioritizing getting all three artifacts first to complete the set bonus. Once that is done, shift focus to only the Chroma Key rotation as they are the best resource and Goldfinger is the best artifact.
-            </p>
           </>}
         />
         <Question

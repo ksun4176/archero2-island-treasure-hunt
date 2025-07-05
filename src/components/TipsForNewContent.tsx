@@ -16,7 +16,7 @@ export default function TipsForNewContent() {
           <OrderedList items={[
               <><strong>Save your dice</strong> between events to aim for higher points goals.</>,
               <><strong>Multipliers</strong> are unlocked as you collect more dice. They let you get more rewards from a single roll BUT it will cost you just as many dice (20 dice = 2x, 30 dice = 3x, 50 dice = 5x, 100 dice = 10x).</>,
-              <><strong>Save gems for this event</strong> (unless there is a clearly better event announced). This is one of the best events to be spending your dice (Island Pack 3, Mythstone Chests, etc.)</>,
+              <><strong>Save gems for this event</strong> (unless there is a clearly better event announced). This is one of the best events to be spending your gems (Island Pack 3, Mythstone Chests, etc.)</>,
               <><strong>Once you are past 150k power</strong>, we strongly recommend saving resources to maximize number of dice you get from each rotation (Chroma Keys, Wishes, Shovels).</>,
               <><strong>Read the FAQs.</strong></>,
               <>Check out the rest of the guide as hopefully they make more sense now.</>,

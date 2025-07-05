@@ -1,12 +1,8 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { IntegerInput } from "./IntegerInput";
-import { quests, Rotations } from "@/utils/constants";
+import { quests } from "@/utils/constants";
 import { Quest } from "@/utils/types";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
 
 
 type ProgressBarProps = {
@@ -29,7 +25,7 @@ type RowProps = {
 const Row = (props: RowProps) => {
   const { quest, onNumDiceChange } = props;
   const [numBreakpointsMet, setNumBreakpointsMet] = useState(0);
-  const numDiceLeft = useRef(0);
+  const numDiceLeft = useRef(quest.breakpoints[1].reduce((prev, current) => prev + current));
 
   const numBreakpoints = quest.breakpoints[0].length;
 
@@ -51,10 +47,6 @@ const Row = (props: RowProps) => {
     },
     [numBreakpoints, quest, onNumDiceChange]
   )
-
-  useEffect(() => {
-    numDiceLeft.current = quest.breakpoints[1].reduce((prev, current) => prev + current)
-  },[quest])
 
   return (
     <div className="flex flex-col gap-y-2 max-w-2xs">
@@ -85,14 +77,10 @@ const Row = (props: RowProps) => {
 }
 
 export default function WhereAreDiceContent() {
-  const rotation = useRef<Rotations>(Rotations.None);
-  const [rotationQuests, setQuestRotations] = useState<Quest[]>([]);
-  const [nonRollingDice, setNonRollingDice] = useState(new Map<string, [number,number]>());
-
-  const handleRotationChange = (event: SelectChangeEvent<number>) => {
-    rotation.current = event.target.value as number;
-    setQuestRotations(quests.get(rotation.current) ?? []);
-  };
+  const [nonRollingDice, setNonRollingDice] = useState(new Map(quests
+    .filter(quest => !quest.fromRolling)
+    .map(quest => ([quest.name, [0, quest.breakpoints[1].reduce((prev, current) => prev + current)]]))
+  ));
 
   const onNumDiceChange = (key: string, diceEarned: number, diceLeft: number) => {
     setNonRollingDice(oldMap => {
@@ -102,65 +90,35 @@ export default function WhereAreDiceContent() {
     })
   }
 
-  useEffect(() => {
-    if (!rotationQuests) {
-      setNonRollingDice(new Map());
-    }
-    else {
-      setNonRollingDice(new Map(rotationQuests
-        .filter(quest => !quest.fromRolling)
-        .map(quest => ([quest.name, [0, quest.breakpoints[1].reduce((prev, current) => prev + current)]]))
-      ))
-    }
-  }, [rotationQuests])
-
   const totalDice = nonRollingDice.size > 0 ? 
     [...nonRollingDice.values()].reduce((prev, current) => [prev[0] + current[0], prev[1] + current[1]]) :
     [0, 0];
   return (
     <div>
       <div>
-        <div className="py-2 w-xs">
-          <FormControl fullWidth size="small">
-            <InputLabel id="rotation-label">Rotation</InputLabel>
-            <Select
-              labelId="rotation-label"
-              id="rotation-select"
-              value={rotation.current}
-              label="Rotation"
-              onChange={handleRotationChange}
-            >
-              <MenuItem value={1}>Keys</MenuItem>
-              <MenuItem value={2}>Wishes</MenuItem>
-              <MenuItem value={3}>Shovels</MenuItem>
-            </Select>
-          </FormControl>
+        <h3 className="text-lg font-semibold">Quests that you can complete without rolling</h3>
+        <p className="pb-2">{`These quests affects your Points per Initial Dice (PPID) as it adds to your '# of Starting Dice'.`}</p>
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-x-2 gap-y-4 border-b border-dashed border-gray-600 pb-2">
+          {quests.filter(quest => !quest.fromRolling).map((quest, index) => (
+            <Row key={index} quest={quest} onNumDiceChange={onNumDiceChange}/>
+          ))}
         </div>
-        {rotationQuests?.length > 0 && <>
-          <h3 className="text-lg font-semibold">Quests that you can complete without rolling</h3>
-          <p className="pb-2">{`These quests affects your Points per Initial Dice (PPID) as it adds to your '# of Starting Dice'.`}</p>
-          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-x-2 gap-y-4 border-b border-dashed border-gray-600 pb-2">
-            {rotationQuests.filter(quest => !quest.fromRolling).map((quest, index) => (
-              <Row key={index} quest={quest} onNumDiceChange={onNumDiceChange}/>
+        <div className="flex gap-2 font-bold text-xl pb-8">
+          <p className="w-[200px]">{`Dice Earned: ${totalDice[0]}`}</p>
+          <p>{`Dice Left: ${totalDice[1]}`}</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">Quests that you complete while rolling</h3>
+          <p className="pb-2">These quests give you free dice from just rolling.</p>
+          <ul className="list-disc ms-5">
+            {quests.filter(quest => quest.fromRolling).map((quest, index) => (
+              <li key={index}>
+                <strong>{quest.name} Quest</strong>: {quest.breakpoints[1].reduce((prev, current) => prev + current)} dice available with breakpoints ranging from {quest.breakpoints[0][0]} to {quest.breakpoints[0][quest.breakpoints[0].length-1]}
+              </li>
             ))}
-          </div>
-          <div className="flex gap-2 font-bold text-xl pb-8">
-            <p className="w-[200px]">{`Dice Earned: ${totalDice[0]}`}</p>
-            <p>{`Dice Left: ${totalDice[1]}`}</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">Quests that you complete while rolling</h3>
-            <p className="pb-2">These quests give you free dice from just rolling.</p>
-            <ul className="list-disc ms-5">
-              {rotationQuests.filter(quest => quest.fromRolling).map((quest, index) => (
-                <li key={index}>
-                  <strong>{quest.name} Quest</strong>: {quest.breakpoints[1].reduce((prev, current) => prev + current)} dice available with breakpoints ranging from {quest.breakpoints[0][0]} to {quest.breakpoints[0][quest.breakpoints[0].length-1]}
-                </li>
-              ))}
-              <li><strong>Rolling Around Board</strong>: There are a few tiles on the board that gives free dice when you land on them</li>
-            </ul>
-          </div>
-        </>}
+            <li><strong>Rolling Around Board</strong>: There are a few tiles on the board that gives free dice when you land on them</li>
+          </ul>
+        </div>
       </div>
     </div>
   )
