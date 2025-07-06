@@ -2,11 +2,24 @@ import random
 from abc import ABC, abstractmethod
 import csv
 import statistics
-import copy
 from typing import Dict
 import math
+from enum import Enum
+import pandas
 
-#region classes
+class Stat(Enum):
+  POINTS = "Points"
+  ROLLS_DONE = "Rolls Done",
+  INITIAL_DICE = "Initial Dice",
+  EXTRA_DICE = "Extra Dice",
+  GEMS = "Gems",
+  CHROMA = "Chromatic Keys",
+  WISHES = "Wish Coins",
+  SHOVELS = "Rune Shovels",
+  PROMISE = "Promise Shovels",
+  OTTA = "Otta Shards",
+  GOLD = "Gold Coins"
+
 class SimulationDetails:
   """Details about the simulation
   """
@@ -14,33 +27,20 @@ class SimulationDetails:
     self.label = label
     self.multipliers = multipliers
 
-class SimResultState:
-  """The Sim Result Stats
-  """
-  def __init__(self, points: int = 0, rolls_done: int = 0, initial_dice: int = 0, free_dice: int = 0, gems: int = 0, chroma: int = 0, obsidian: int = 0, otta: int = 0, gold: int = 0):
-    self.points = points
-    self.rolls_done = rolls_done
-    self.initial_dice = initial_dice
-    self.free_dice = free_dice
-    self.gems = gems
-    self.chroma = chroma
-    self.obsidian = obsidian
-    self.otta = otta
-    self.gold = gold
-
 class SimResult:
   """Result of a simulation
   """
   points_breakpoints = [bp + s for s in [0, 20000, 40000, 60000, 80000] for bp in [2000, 5000, 8000, 12000, 16000, 20000]]
 
-  roll_dice_task_breakpoints = [5, 10, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600]
-  roll_dice_task_reward = [1, 2, 2, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+  roll_dice_task_breakpoints = [5, 10, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
+  roll_dice_task_reward = [1, 2, 2, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
   def __init__(self):
-    self.current_state = SimResultState()
-    self.saved_state: list[tuple[int, SimResultState]] = []
     self.points_bp_met = -1
     self.roll_dice_bp_met = -1
+    self.stats = {}
+    for stat in Stat:
+      self.stats[stat] = 0
 
   def add_points(self, num_points: int):
     """Add points to the result AND get the number of dice we get back from meeting points breakpoints
@@ -52,17 +52,17 @@ class SimResult:
       return 0
     
     # add points to result
-    self.current_state.points += num_points
+    self.stats[Stat.POINTS] += num_points
 
     # check if we met any points breakpoints
     num_dice = 0
     for bp in self.points_breakpoints[self.points_bp_met+1:]:
-      if (self.current_state.points < bp):
+      if (self.stats[Stat.POINTS] < bp):
         break
       self.points_bp_met += 1
       num_dice += 2
 
-    self.current_state.free_dice += num_dice
+    self.stats[Stat.EXTRA_DICE] += num_dice
   
   def add_rolls(self, num_rolls: int):
     """Add number of rolls to the result AND get the number of dice we get back from meeting Roll Dice task breakpoints
@@ -74,30 +74,22 @@ class SimResult:
       return 0
 
     # add rolls done to result
-    self.current_state.rolls_done += num_rolls
+    self.stats[Stat.ROLLS_DONE] += num_rolls
 
     # ONLY add to initial dice IF we run out of free dice
-    if (self.current_state.free_dice <= num_rolls):
-      self.current_state.initial_dice += num_rolls - self.current_state.free_dice
-    self.current_state.free_dice = max(0, self.current_state.free_dice - num_rolls)
+    if (self.stats[Stat.EXTRA_DICE] <= num_rolls):
+      self.stats[Stat.INITIAL_DICE] += num_rolls - self.stats[Stat.EXTRA_DICE]
+    self.stats[Stat.EXTRA_DICE] = max(0, self.stats[Stat.EXTRA_DICE] - num_rolls)
 
     # check if we meet any task breakpoints
     num_dice = 0
     for bp in self.roll_dice_task_breakpoints[self.roll_dice_bp_met+1:]:
-      if (self.current_state.rolls_done < bp):
+      if (self.stats[Stat.ROLLS_DONE] < bp):
         break
       self.roll_dice_bp_met += 1
       num_dice = self.roll_dice_task_reward[self.roll_dice_bp_met]
 
-    self.current_state.free_dice += num_dice
-
-  def save(self, current_position):
-    """Save the history of state
-
-    Args:
-      current_position (int): Current position that we are on
-    """
-    self.saved_state.append([current_position, copy.deepcopy(self.current_state)])
+    self.stats[Stat.EXTRA_DICE] += num_dice
 
 class Tile(ABC):
   """
@@ -151,51 +143,49 @@ class FlatTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
     result.add_points(self.points * multiplier)
 
-    result.current_state.gems += (self.gems * multiplier)
+    result.stats[Stat.GEMS] += (self.gems * multiplier)
 
-    result.current_state.free_dice += (self.dice * multiplier)
+    result.stats[Stat.EXTRA_DICE] += (self.dice * multiplier)
 
   def get_value(self):
     return self.points, self.dice
 
 class GrandPrizeTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
-    spin = random.randint(1,10000)
-    if (spin <= 666): # 2x chroma keys
-      result.current_state.chroma += (2 * multiplier)
-    elif (spin <= 666 + 2666): # 1x obsidian key
-      result.current_state.obsidian += (1 * multiplier)
-    elif (spin <= 666 + 2666 + 2666): # 100 gems
-      result.current_state.gems += (100 * multiplier)
-    elif (spin <= 666 + 2666 + 2666 + 666): # 1x chroma key
-      result.current_state.chroma += (1 * multiplier)
-    elif (spin <= 666 + 2666 + 2666 + 666 + 666): # 2x dice
-      result.current_state.free_dice += (2 * multiplier)
-    else: # 1x dice
-      result.current_state.free_dice += (1 * multiplier)
+    prizes = [
+      { 'prize': Stat.CHROMA, 'amount': 2},
+      { 'prize': Stat.WISHES, 'amount': 1},
+      { 'prize': Stat.GEMS, 'amount': 100},
+      { 'prize': Stat.PROMISE, 'amount': 1},
+      { 'prize': Stat.EXTRA_DICE, 'amount': 2},
+      { 'prize': Stat.EXTRA_DICE, 'amount': 1},
+    ]
+    prize_weights = [
+      666,
+      2666,
+      2666,
+      666,
+      666,
+      2666
+    ]
+    spins = random.choices(prizes, weights=prize_weights)
+    spin = spins[0]
+    result.stats[spin['prize']] += (spin['amount'] * multiplier)
   
   def get_value(self):
     return 0, (666 * 2 + 2666 * 1) / 10000
 
 class PointWheelTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
-    spin = random.randint(1,10000)
-    points = 100
-    if (spin <= 3478):
-      points = 200
-    elif (spin <= 3478 + 2608):
-      points = 500
-    elif (spin <= 3478 + 2608 + 434):
-      points = 1000
-
-    spin2 = random.randint(1,10000)
-    spin_multiplier = 1
-    if (spin2 <= 3076):
-      spin_multiplier = 3
-    elif (spin2 <= 3076 + 769):
-      spin_multiplier = 5
-
-    result.add_points(points * spin_multiplier * multiplier)
+    points = [100, 200, 500, 1000]
+    points_weights = [3478,3478, 2608, 434]
+    spins = random.choices(points, weights=points_weights)
+    spin = spins[0]
+    multipliers = [1, 3, 5]
+    multipliers_weights = [6153, 3076, 769]
+    spins2 = random.choices(multipliers, weights=multipliers_weights)
+    spin2 = spins2[0]
+    result.add_points(spin * spin2 * multiplier)
   
   def get_value(self):
     # spin points
@@ -206,23 +196,30 @@ class PointWheelTile(Tile):
 
 class FateWheelTile(Tile):
   def get_reward(self, multiplier: int, result: SimResult):
-    spin = random.randint(1,10000)
-    if (spin <= 2500): # 100 points
-      result.add_points(500 * multiplier)
-    elif (spin <= 2500 + 300): # 2x otta
-      result.current_state.otta += (2 * multiplier)
-    elif (spin <= 2500 + 300 + 700): # 1x chroma key
-      result.current_state.chroma += (1 * multiplier)
-    elif (spin <= 2500 + 300 + 700 + 1500): # 1x dice
-      result.current_state.free_dice += (1 * multiplier)
-    else: # 2000 gold
-      result.current_state.gold += (2000 * multiplier)
+    prizes = [
+      { 'prize': Stat.POINTS, 'amount': 500},
+      { 'prize': Stat.OTTA, 'amount': 2},
+      { 'prize': Stat.WISHES, 'amount': 1},
+      { 'prize': Stat.EXTRA_DICE, 'amount': 1},
+      { 'prize': Stat.GOLD, 'amount': 2000},
+    ]
+    prize_weights = [
+      2500,
+      300,
+      700,
+      1500,
+      5000,
+    ]
+    spins = random.choices(prizes, weights=prize_weights)
+    spin = spins[0]
+    if (spin['prize'] == Stat.POINTS):
+      result.add_points(spin['amount'] * multiplier)
+    else:
+      result.stats[spin['prize']] += (spin['amount'] * multiplier)
   
   def get_value(self):
     return (500 * 2500) / 10000, (1500 * 1) / 10000
-#endregion classes
 
-#region helpers
 def calc_best_multipliers(board: list[Tile], multiplier: int):
   """Calculate the best multipliers for the board
 
@@ -325,90 +322,11 @@ def calc_best_multipliers(board: list[Tile], multiplier: int):
     best_ppd = ppd
   return best_multiplier
 
-averages_output = '''Averages:
-- Number of points earned: {points:,}
-- Number of dice needed initially: {initial_dice:,}
-- Points per initial dice: {ppid:,}
-- Number of rolls overall: {rolls:,}
-- Points per roll: {ppd:,}
-- Extra dice gotten: {free_dice:,}
-- Gems gotten: {gems:,}
-- Chroma keys gotten: {chroma:,}
-- Obsidian keys gotten: {obsidian:,}
-- Otta shards gotten: {otta:,}
-- Gold gotten: {gold:,}
-'''
-def output_stats(runs: list[SimResult]):
-  """Output the stats of all the runs
-
-  Args:
-    runs (list[SimResult]): The simulation runs
-  """
-  num_rounds = len(runs)
-  total_points = 0
-  total_rolls_done = 0
-  total_initial_dice = 0
-  total_free_dice = 0
-  total_gems = 0
-  total_chroma = 0
-  total_obsidian = 0
-  total_otta = 0
-  total_gold = 0
-  tiles_hit_freq = [0] * 24
-  for i in range(num_rounds):
-    run = runs[i]
-    total_points += run.current_state.points
-    total_rolls_done += run.current_state.rolls_done
-    total_initial_dice += run.current_state.initial_dice
-    total_free_dice += run.current_state.free_dice
-    total_gems += run.current_state.gems
-    total_chroma += run.current_state.chroma
-    total_obsidian += run.current_state.obsidian
-    total_otta += run.current_state.otta
-    total_gold += run.current_state.gold
-    for state in run.saved_state:
-      tiles_hit_freq[state[0]] += 1
-  
-  avg_points = total_points / num_rounds
-  avg_initial_dice = total_initial_dice / num_rounds
-  avg_free_dice = total_free_dice / num_rounds
-  avg_rolls = total_rolls_done / num_rounds
-  print(averages_output.format(
-    points=avg_points,
-    initial_dice=avg_initial_dice,
-    ppid=avg_points / (avg_initial_dice - avg_free_dice),
-    rolls=avg_rolls,
-    ppd=avg_points / avg_rolls,
-    free_dice=avg_free_dice,
-    gems=total_gems / num_rounds,
-    chroma=total_chroma / num_rounds,
-    obsidian=total_obsidian / num_rounds,
-    otta=total_otta / num_rounds,
-    gold=total_gold / num_rounds
-  ))
-  for i in range(len(tiles_hit_freq)):
-    tiles_hit_freq[i] /= num_rounds
-  print(f'Tiles hit frequencies: {tiles_hit_freq}')
-
-def output_csv(csv_file_name: str, runs: list[SimResult]):
-  header = ['# of Points', '# of Dice Initially', 'Points per Initial Dice', '# of Rolls Done', 'Points per Roll', '# of Gems', '# of Chroma Keys', '# of Obsidian Keys', '# of Otta Shards', '# of Gold']
-  with open(f'generated/{csv_file_name}', 'w', newline='') as csvfile:
-      csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-      csvwriter.writerow(header)
-      for run in runs:
-        row = [
-          run.current_state.points,
-          run.current_state.initial_dice,
-          run.current_state.points / run.current_state.initial_dice,
-          run.current_state.rolls_done,
-          run.current_state.points / run.current_state.rolls_done,
-          run.current_state.gems,
-          run.current_state.chroma,
-          run.current_state.obsidian,
-          run.current_state.otta,
-          run.current_state.gold
-        ]
-        csvwriter.writerow(row)
+def output_stats(df: pandas.DataFrame):
+  avg_stats = df.mean()
+  print(f"PPID: {avg_stats[Stat.POINTS] / (avg_stats[Stat.INITIAL_DICE] - avg_stats[Stat.EXTRA_DICE])}")
+  print(f"PPR: {avg_stats[Stat.POINTS] / avg_stats[Stat.ROLLS_DONE]}")
+  print(avg_stats)
 
 def create_sim_details_same_mult(label: str, multipliers: list[int]):
   """Create a SimulationDetails with the same multiplier map at every level
@@ -426,9 +344,8 @@ def create_sim_details_same_mult(label: str, multipliers: list[int]):
     5: multipliers,
     10: multipliers,
   })
-#endregion helpers
 
-def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num_dice_rolls: int, points_to_meet: int, save_history: bool = False):
+def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num_dice_rolls: int, points_to_meet: int, current_points: int = 0, dice_used: int = 0, current_tile: int = 0):
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
@@ -436,17 +353,26 @@ def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num
     multipliers (Dict[int,list[int]]): The multipliers to apply when rolling from each tile
     num_dice_rolls (int): Number of dice to start with. The sim will stop if all of these dice are used.
     points_to_meet (int): Number of points to aim for. The sim will stop if we reach this threshold even if we didn't use all starting dice.
-    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
-
+    current_points (int, optional): The current number of points we have. Defaults to 0.
+    dice_used (int, optional): The number of dice we have used. Defaults to 0.
+    current_tile (int, optional): The current tile we are on. Defaults to 0.
+  
   Returns:
     SimResult: Result of simulation
   """
   result = SimResult()
-  current_position = 0
-  while (result.current_state.points < points_to_meet and (result.current_state.initial_dice < num_dice_rolls or result.current_state.free_dice > 0)) :
+  # add dice_used but clear out free_dice so it doesn't bleed over
+  result.add_rolls(dice_used)
+  result.stats[Stat.EXTRA_DICE] = 0
+  # add current_points but clear out free_dice so it doesn't bleed over
+  result.add_points(current_points)
+  result.stats[Stat.EXTRA_DICE] = 0
+  current_position = current_tile
+
+  while (result.stats[Stat.POINTS] < points_to_meet and (result.stats[Stat.INITIAL_DICE] < num_dice_rolls or result.stats[Stat.EXTRA_DICE] > 0)) :
     # get multiplier then check if it's allowed
-    num_turns = num_dice_rolls - result.current_state.initial_dice + result.current_state.free_dice
-    list_of_multipliers = [ 1 ] * 24
+    num_turns = num_dice_rolls - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
+    list_of_multipliers = [1] * 24
     if (num_turns >= 100):
       list_of_multipliers = multipliers[10]
     elif (num_turns >= 50):
@@ -473,14 +399,23 @@ def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num
     current_position = (current_position + roll) % 24
     tile = board[current_position]
     tile.get_reward(multiplier, result)
-
-    # save history
-    if (save_history):
-      result.save(current_position)
   
   return result
 
-def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False, save_history: bool = False):
+def add_round_to_dataset(dataset, stats):
+  """Add a simulation round stats to the dataset that will later be transformed into a pandas DataFrame
+
+  Args:
+      dataset (dict): dataset to add to
+      stats (dict): simulation stats to add
+  """
+  for s in Stat:
+    if (s in dataset):
+      dataset[s].append(stats[s])
+    else:
+      dataset[s] = [stats[s]]
+
+def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
 
   Args:
@@ -490,7 +425,6 @@ def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_roun
     num_dices (list[int]): List of the number of dice to start each simulation with
     points_to_meet (int): Number of points to aim for. The sim will stop if we reach this threshold even if we didn't use all starting dice.
     output_csv (bool): Whether we should output the runs in a CSV
-    save_history (bool): Whether we should save the state of run after every single roll. Will slow down sim.
   """
   for sim in sim_details:
     runs = []
@@ -498,13 +432,18 @@ def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_roun
     for dices in num_dices:
       print('Simulation of {:,} players starting with {:,} dice each trying to reach {:,} points:'.format(num_rounds, dices, points_to_meet))
       print('Applied Multipliers: {}'.format(sim.multipliers))
+      dataset = {}
       for i in range(num_rounds):
-        runs.append(simulate_single_run(board, sim.multipliers, dices, points_to_meet, save_history))
+        result = simulate_single_run(board, sim.multipliers, dices, points_to_meet)
+        add_round_to_dataset(dataset, result.stats)
         if (i % 10000 == 9999):
           print(f'{i+1} sims done')
-      output_stats(runs)
+      df = pandas.DataFrame(dataset)
+      output_stats(df)
+      runs.append(df)
+    sim_df = pandas.concat(runs)
     if (csv):
-      output_csv(f'{sim.label}.csv', runs)
+      sim_df.to_csv(f"generated/{sim.label}.csv", index=False)
 
 board = [
   FlatTile(points=400),
@@ -540,119 +479,53 @@ sims = [
     5: calc_best_multipliers(board,5),
     10: calc_best_multipliers(board,10)
   }),
-  create_sim_details_same_mult('6x10', [ 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
   create_sim_details_same_mult('5x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
 ]
 
-# def fiery_sim():
-#   def get_stats(runs: list[SimResult], points_to_meet: int):
-#     num_rounds = len(runs)
-#     total_points = 0
-#     total_initial_dice = 0
-#     total_free_dice = 0
-#     num_over_threshold = 0
-#     for i in range(num_rounds):
-#       run = runs[i]
-#       if (run.current_state.points >= points_to_meet):
-#         num_over_threshold += 1
-#       total_points += run.current_state.points
-#       total_initial_dice += run.current_state.initial_dice
-#       total_free_dice += run.current_state.free_dice
-    
-#     avg_points = total_points / num_rounds
-#     avg_initial_dice = total_initial_dice / num_rounds
-#     avg_free_dice = total_free_dice / num_rounds
-#     ppid = avg_points / (avg_initial_dice - avg_free_dice)
-#     return num_over_threshold, ppid
+def calculate_success_rate(goal_points: int, num_dice: int, current_points: int = 0, rolls_done: int = 0, current_tile: int = 0):
+  """Run 10,000 simulations and get how many of those runs were able to achieve the goal set
 
-#   def compile_stats(sim_results: list[int, int, tuple[list[int], int, int]]):
-#     winning_count = 0
-#     winners = []
-#     for i in range(len(sim_results)):
-#       map_stats = sim_results[i]
-#       if (map_stats[3] > winning_count):
-#         winning_count = map_stats[3]
-#         winners = [{ 'multipliers': map_stats[2], 'ppid': map_stats[4] }]
-#       elif (map_stats[3] == winning_count):
-#         winners.append({ 'multipliers': map_stats[2], 'ppid': map_stats[4] })
-#     return winning_count, winners
+  Args:
+    goal_points (int): The number of points to aim for
+    num_dice (int): The number of dice we have
+    current_points (int, optional): The current number of points we have. Defaults to 0.
+    rolls_done (int, optional): The number of rolls we have done. Defaults to 0.
+    current_tile (int, optional): The current tile we are on. Defaults to 0.
+  """
+  num_success = 0
+  num_runs = 10_000
+  for i in range(num_runs):
+    run = simulate_single_run(board, sims[1].multipliers, num_dice + rolls_done, math.inf, current_points, rolls_done, current_tile)
+    if (run.stats[Stat.POINTS] >= goal_points):
+      num_success += 1
+  success_rate = (num_runs - 1 if num_success == num_runs else num_success) / num_runs * 100
+  print(f'Success rate: {success_rate}%')
 
-#   def create_maps():
-#     map_template = [False, False, False, False, False, False, False, True, True, True, False, False, False, False, False, False, False, False, False, False, True, True, True, False]
-#     maps = []
-#     def traverse(maps: list[list[int]], index: int, map_to_build: list[int]):
-#       if (index == len(map_template)):
-#         maps.append(map_to_build)
-#         return
-#       if (not map_template[index]):
-#         map_to_build.append(1)
-#         traverse(maps, index+1, map_to_build)
-#       else:
-#         map1 = map_to_build.copy()
-#         map1.append(1)
-#         traverse(maps, index+1, map1)
-#         map2 = map_to_build.copy()
-#         map2.append(2)
-#         traverse(maps, index+1, map2)
-#         map3 = map_to_build.copy()
-#         map3.append(3)
-#         traverse(maps, index+1, map3)
-#         map5 = map_to_build.copy()
-#         map5.append(5)
-#         traverse(maps, index+1, map5)
-#     traverse(maps, 0, [])
-#     sim_maps = list(map(create_sim_details_same_mult, [f'map{i}' for i in range(len(maps))], maps))
-#     return sim_maps
-#   maps = create_maps()
-
-#   sims = {
-#     20_000: {
-#       "dices": [10 * i for i in range(5,11)],
-#       "maps": maps
-#     },
-#     40_000: {
-#       "dices": [10 * i for i in range(11,19)],
-#       "maps": maps
-#     },
-#   }
-
-#   all_results = []
-#   all_compiled_results = {}
-#   for points_to_meet in sims.keys():
-#     compiled_results = {}
-#     for dices in sims[points_to_meet]["dices"]:
-#       num_sims = len(sims[points_to_meet]["maps"])
-#       results = []
-#       count = 0
-#       print(f'Simulation of 10,000 players starting with {dices:,} dice each trying to reach {points_to_meet:,} points:')
-#       for sim in sims[points_to_meet]["maps"]:
-#         map_runs = []
-#         for i in range(10_000):
-#           map_runs.append(simulate_single_run(board, sim.multipliers, dices, math.inf))
-#         num_over_thresold, ppid = get_stats(map_runs, points_to_meet)
-#         results.append([points_to_meet, dices, sim.multipliers[2], num_over_thresold, ppid])
-#         count += 1
-#         print(f'{points_to_meet:,} points {dices} dices: {count}/{num_sims} sims complete')
-#       all_results += results
-#       winning_count, best_results = compile_stats(results)
-#       compiled_results[dices] = {
-#         'success rate': winning_count/10_000*100,
-#         'results': best_results
-#       }
-#     all_compiled_results[points_to_meet] = compiled_results
-#   print(all_compiled_results)
-#   def output_results_into_csv():
-#     header = ['# of Points', '# of Dice Initially', 'Multiplier Map', 'Success Rate', 'PPID']
-#     with open('fiery_wind.csv', 'w', newline='') as csvfile:
-#         csvwriter = csv.writer(csvfile)
-#         csvwriter.writerow(header)
-#         for result in all_results:
-#           row = [
-#             result[0],
-#             result[1],
-#             result[2],
-#             result[3] / 10_000 * 100,
-#             result[4]
-#           ]
-#           csvwriter.writerow(row)
-#   output_results_into_csv()
+def simulation_kai(sim_details: list[SimulationDetails], board: list[Tile], num_sims: int, percentile: float):
+  # This is a simulation to determine how many rounds it would take people to save up to 400 dice assuming they are:
+  # 1. Getting 142 dice per round
+  # 2. Spending to get 20k dice each round
+  for sim in sim_details:
+    print(sim.label)
+    print('Applied Multipliers: {}'.format(sim.multipliers))
+    runs = []
+    for i in range(num_sims):
+      num_rounds = 1
+      num_dice = 142
+      while num_dice < 400:
+        print(f"Round {num_rounds}: Starting with {num_dice} dice")
+        result = simulate_single_run(board, sim.multipliers, num_dice, 20_000)
+        # Subtract number of dice used and add number of free dice rolling that was unused
+        num_dice = num_dice - result.current_state.initial_dice + result.current_state.free_dice
+        # Just a sanity check. Shouldn't ever happen really.
+        if num_dice < 0:
+          raise Exception("What the actual heck")
+        # Go to next round
+        num_rounds += 1
+        num_dice += 142
+      print(f"Round {num_rounds}: Ending with {num_dice} dice")
+      runs.append(num_rounds)
+    # Sort runs and get the percentile result
+    runs.sort()
+    index = int(num_sims*percentile)
+    print(f"{percentile*100}% of people will be able to roll 100k by round {runs[index]}")

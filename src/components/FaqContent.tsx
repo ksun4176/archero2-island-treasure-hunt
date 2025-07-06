@@ -70,18 +70,20 @@ export default function FaqContent() {
           question="Should I buy the Island Pack 3 for 750 gem?"
           answer={<>
             <p className="mb-2">
-              Based on our estimates, this pack is worth <strong><u>at least</u></strong> 1100 gems.
+              Based on our estimates, this pack is worth <strong><u>at least</u></strong> 1350 gems.
             </p>
             <div className="mb-2">
               <h6 className="underline">Math:</h6>
               <p>Average for 100k points:</p>
               <UnorderedList items={[
                 "Number of Dice Needed: 269",
-                "Points Rewards: 55k gems (40k from loot + 10k from mythic artifact + 5k from treasure coin)",
-                "Gems Gotten: 2771.18 gems",
-                "Chroma Keys Gotten: 4.16 keys",
+                "Points Rewards: 68500 gems (Loot + Mythic Artifact + Treasure Coins)",
+                "Gems Gotten: 2700 gems",
+                "Chroma Keys Gotten: 2 keys",
+                "Wish Coins Gotten: 5 coins",
+                "Promised Shovels Gotten: 1 shovel"
               ]} />
-              <p>Value of a single dice: (55k gems + 2771.18 gems + 4.16 keys * 400 gems) / 269 dice = <strong>220 gems</strong></p>
+              <p>Value of a single dice: (68500 + 2700 + 1135 gems) / 269 dice ≈ <strong>270 gems</strong></p>
             </div>
           </>}
         />
