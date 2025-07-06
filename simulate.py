@@ -473,13 +473,14 @@ board = [
 ]
 
 sims = [
-  SimulationDetails('BestMultipliers', {
-    2: calc_best_multipliers(board,2),
-    3: calc_best_multipliers(board,3),
-    5: calc_best_multipliers(board,5),
-    10: calc_best_multipliers(board,10)
-  }),
+  # SimulationDetails('BestMultipliers', {
+  #   2: calc_best_multipliers(board,2),
+  #   3: calc_best_multipliers(board,3),
+  #   5: calc_best_multipliers(board,5),
+  #   10: calc_best_multipliers(board,10)
+  # }),
   create_sim_details_same_mult('5x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
+  create_sim_details_same_mult('bublite', [1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10]),
 ]
 
 def calculate_success_rate(goal_points: int, num_dice: int, current_points: int = 0, rolls_done: int = 0, current_tile: int = 0):
@@ -502,7 +503,7 @@ def calculate_success_rate(goal_points: int, num_dice: int, current_points: int 
   print(f'Success rate: {success_rate}%')
 
 def simulation_kai(sim_details: list[SimulationDetails], board: list[Tile], num_sims: int, percentile: float):
-  # This is a simulation to determine how many rounds it would take people to save up to 400 dice assuming they are:
+  # This is a simulation to determine how many rounds it would take people to save up to 325 dice assuming they are:
   # 1. Getting 142 dice per round
   # 2. Spending to get 20k dice each round
   for sim in sim_details:
@@ -512,11 +513,11 @@ def simulation_kai(sim_details: list[SimulationDetails], board: list[Tile], num_
     for i in range(num_sims):
       num_rounds = 1
       num_dice = 142
-      while num_dice < 400:
+      while num_dice < 325:
         print(f"Round {num_rounds}: Starting with {num_dice} dice")
         result = simulate_single_run(board, sim.multipliers, num_dice, 20_000)
         # Subtract number of dice used and add number of free dice rolling that was unused
-        num_dice = num_dice - result.current_state.initial_dice + result.current_state.free_dice
+        num_dice = num_dice - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
         # Just a sanity check. Shouldn't ever happen really.
         if num_dice < 0:
           raise Exception("What the actual heck")
@@ -528,4 +529,4 @@ def simulation_kai(sim_details: list[SimulationDetails], board: list[Tile], num_
     # Sort runs and get the percentile result
     runs.sort()
     index = int(num_sims*percentile)
-    print(f"{percentile*100}% of people will be able to roll 100k by round {runs[index]}")
+    print(f"{percentile*100}% of people will be able to have {325} dice by round {runs[index]}")

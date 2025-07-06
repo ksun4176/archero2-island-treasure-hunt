@@ -88,21 +88,37 @@ export default function FaqContent() {
           </>}
         />
         <Question
-          question="Why aim for 100k points? Should we roll more if we have more dice?"
+          question="Should I play every event or save dice between events?"
           answer={<>
             <div className="mb-2">
-              <p>Hitting 100k points strikes the best balance between breakpoint rewards AND ranking rewards. It also rounds you out to 10 artifact shards, the amount needed to actually unlock it.</p>
+              <p>{`Before collecting all golden artifacts, save your dice and only play when you can reach 100k points. This gives you solid breakpoint + ranking rewards and exactly 10 shards—enough to unlock an artifact.`}</p>
+              <p>{`Once you have one of each artifact, choose a focus:`}</p>
+            </div>
+            <div className="mb-2">
+              <p>{`🎯 Gear & Keys Focus`}</p>
               <UnorderedList items={[
-                <>Going straight for 100k (while skipping events) <strong><u>instead</u></strong> of aiming for 20k every time gives you ~3 more treasure coins, plus extra treasure coins from better rankings.</>,
-                <>Hitting 100k twice <strong><u>instead</u></strong> of 200k once earns you ~10 more artifact shards, at the cost of only ~2 treasure coins.</>,
+                <>Aim for 20k points per event</>,
+                <>Save remaining dice</>,
+                <>Go for 100k points when possible</>,
+                <>Average of ~20 more keys/month</>,
+              ]} />
+            </div>
+            <div className="mb-2">
+              <p>{`🏺 Artifacts, Treasure Coins & GvG Focus`}</p>
+              <UnorderedList items={[
+                <>Skip events, save dice and aim for 100k points only</>,
+                <>Average of ~2 more treasure coins/month</>,
+                <>Average of ~14 more rune shovels/month</>,
+                <>Average of ~6 more wish coins/month</>,
+                <>Average of ~8 more promised shovels/month</>,
               ]} />
             </div>
             <div>
               <p>Now whether it is worth spending extra dice to go past 100k is totally up to you—but here are a few things to think about:</p>
               <UnorderedList items={[
-                "Will you still have enough dice to roll comfortably next time you want to play?",
-                "Can you hit the next 10k milestone? This guarantees you another treasure coin and 10 chromatic keys.",
-                "Any little gains such as aiming for the next reward tier will have to be based on your gut feel. Good luck!"
+                "Will you have enough dice to roll comfortably next time you want to play?",
+                "Can you hit the next 10k milestone for another guaranteed treasure coin.",
+                "Any little gains such as aiming for the next reward tier will be based on your gut feel. Good luck!"
               ]} />
             </div>
           </>}
@@ -131,7 +147,7 @@ export default function FaqContent() {
                 <><strong>{`Cupid's Bow`}</strong>{`: Cheap, cost only 2 tickets.`}</>,
                 <><strong>{`Cupid's Arrow`}</strong>{`: Completes the set and works across all modes. Worth considering getting stars as a Dragoon Helmet user.`}</>,
                 <><strong>{`Thronebreaker Shield (PVP only)`}</strong>{`: Cheap, cost only 2 tickets.`}</>,
-                <><strong>{`Demon Artifacts (PVP only)`}</strong>{`: Good effects.`}</>,
+                <><strong>{`Demon Artifacts (PVP only)`}</strong>{`: Good effects and even better now that GvG is here.`}</>,
                 <><strong>{`Otta`}</strong>{`: 2-star is when he starts to shine in PVP and possibly Boss Battles. Only available in this shop and unfortunately requires a longgg-term commitment (200 shards).`}</>,
                 <><strong>{`Battle Rite Artifacts (PVP only)`}</strong>{`: Worse effect than Demons and has a meh set bonus.`}</>,
                 <><strong>{`Epic Characters`}</strong>{`: A good way to get it although pricey (only Seraph and Dracoola though).`}</>,
