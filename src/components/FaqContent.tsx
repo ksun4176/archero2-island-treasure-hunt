@@ -129,12 +129,12 @@ export default function FaqContent() {
             <div className="mb-2">
               <p>
                 Each event rotation focuses on a single artifact for the week. You can collect shards for that artifact as you meet points milestones. The artifacts rotate between Goldfinger, Golden Fleece, and Golden Mask.<br/>
-                We recommend: <br/>
+                We recommend you: <br/>
               </p>
               <OrderedList items={[
-                "prioritizing getting one of each of the three artifacts first to complete the set bonus",
-                "shift focus to get Goldfinger to 8 stars",
-                "move to collect star up the other two artifacts equally"
+                "Prioritize getting one of each of the three artifacts first to complete the set bonus",
+                "Shift focus to get Goldfinger to 8 stars ",
+                "Move to star up the other two artifacts equally"
               ]} />
             </div>
           </>}
@@ -165,6 +165,17 @@ export default function FaqContent() {
                 priority
                 unoptimized
               />
+            </div>
+          </>}
+        />
+        <Question
+          question="Should I buy treasure coin from Gem Exchange?"
+          answer={<>
+            <div className="mb-2">
+              <p>
+                The treasure coins is OK value but it does help speed up starring up Demon Artifacts for the purpose of being more competitive in PvP modes like Guild Expedition. <br />
+                There is also a good chance Habby will add new items in the store so you can always save up for that if nothing interests you.
+              </p>
             </div>
           </>}
         />
