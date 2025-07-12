@@ -542,8 +542,7 @@ def simulation_tiers(tiers: dict[int, SimulationDetails], board: list[Tile], num
         break
       if verbose:
         print(f"Got to {result.stats[Stat.POINTS]:,} with {dice:,} left")
-      if (j == len(points_to_meet_list)-1):
-        add_round_to_dataset(dataset, result.stats)
+    add_round_to_dataset(dataset, result.stats)
     if (i % 10000 == 9999):
         print(f"{i+1:,} sims done")
   df = pandas.DataFrame(dataset)
