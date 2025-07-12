@@ -1,6 +1,5 @@
 import random
 from abc import ABC, abstractmethod
-import csv
 import statistics
 from typing import Dict
 import math
@@ -23,7 +22,7 @@ class Stat(Enum):
 class SimulationDetails:
   """Details about the simulation
   """
-  def __init__(self, label: str, multipliers: Dict[int, list[int]]):
+  def __init__(self, label: str, multipliers: list[int]):
     self.label = label
     self.multipliers = multipliers
 
@@ -87,7 +86,7 @@ class SimResult:
       if (self.stats[Stat.ROLLS_DONE] < bp):
         break
       self.roll_dice_bp_met += 1
-      num_dice = self.roll_dice_task_reward[self.roll_dice_bp_met]
+      num_dice += self.roll_dice_task_reward[self.roll_dice_bp_met]
 
     self.stats[Stat.EXTRA_DICE] += num_dice
 
@@ -328,29 +327,12 @@ def output_stats(df: pandas.DataFrame):
   print(f"PPR: {avg_stats[Stat.POINTS] / avg_stats[Stat.ROLLS_DONE]}")
   print(avg_stats)
 
-def create_sim_details_same_mult(label: str, multipliers: list[int]):
-  """Create a SimulationDetails with the same multiplier map at every level
-
-  Args:
-      label (str): label for SimulationDetails
-      multipliers (list[int]): multiplier map to apply
-
-  Returns:
-      SimulationDetails: The SimulationDetails
-  """
-  return SimulationDetails(label, {
-    2: multipliers,
-    3: multipliers,
-    5: multipliers,
-    10: multipliers,
-  })
-
-def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num_dice_rolls: int, points_to_meet: int, current_points: int = 0, dice_used: int = 0, current_tile: int = 0):
+def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_rolls: int, points_to_meet: int, current_points: int = 0, dice_used: int = 0, current_tile: int = 0):
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
     board (list[Tile]): The board
-    multipliers (Dict[int,list[int]]): The multipliers to apply when rolling from each tile
+    multipliers (list[int]): The multipliers to apply when rolling from each tile
     num_dice_rolls (int): Number of dice to start with. The sim will stop if all of these dice are used.
     points_to_meet (int): Number of points to aim for. The sim will stop if we reach this threshold even if we didn't use all starting dice.
     current_points (int, optional): The current number of points we have. Defaults to 0.
@@ -372,16 +354,7 @@ def simulate_single_run(board: list[Tile], multipliers: Dict[int,list[int]], num
   while (result.stats[Stat.POINTS] < points_to_meet and (result.stats[Stat.INITIAL_DICE] < num_dice_rolls or result.stats[Stat.EXTRA_DICE] > 0)) :
     # get multiplier then check if it's allowed
     num_turns = num_dice_rolls - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
-    list_of_multipliers = [1] * 24
-    if (num_turns >= 100):
-      list_of_multipliers = multipliers[10]
-    elif (num_turns >= 50):
-      list_of_multipliers = multipliers[5]
-    elif (num_turns >= 30):
-      list_of_multipliers = multipliers[3]
-    elif (num_turns >= 20):
-      list_of_multipliers = multipliers[2]
-    multiplier = list_of_multipliers[current_position]
+    multiplier = multipliers[current_position]
     if (num_turns < 20):
       multiplier = min(1, multiplier)
     elif (num_turns < 30):
@@ -473,14 +446,9 @@ board = [
 ]
 
 sims = [
-  # SimulationDetails('BestMultipliers', {
-  #   2: calc_best_multipliers(board,2),
-  #   3: calc_best_multipliers(board,3),
-  #   5: calc_best_multipliers(board,5),
-  #   10: calc_best_multipliers(board,10)
-  # }),
-  create_sim_details_same_mult('5x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
-  create_sim_details_same_mult('bublite', [1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10]),
+  # SimulationDetails('BestMultipliers', calc_best_multipliers(board, 10)),
+  SimulationDetails('5x10', [ 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1 ]),
+  SimulationDetails('bublite', [1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 10]),
 ]
 
 def calculate_success_rate(goal_points: int, num_dice: int, current_points: int = 0, rolls_done: int = 0, current_tile: int = 0):
@@ -501,32 +469,3 @@ def calculate_success_rate(goal_points: int, num_dice: int, current_points: int 
       num_success += 1
   success_rate = (num_runs - 1 if num_success == num_runs else num_success) / num_runs * 100
   print(f'Success rate: {success_rate}%')
-
-def simulation_kai(sim_details: list[SimulationDetails], board: list[Tile], num_sims: int, percentile: float):
-  # This is a simulation to determine how many rounds it would take people to save up to 325 dice assuming they are:
-  # 1. Getting 142 dice per round
-  # 2. Spending to get 20k dice each round
-  for sim in sim_details:
-    print(sim.label)
-    print('Applied Multipliers: {}'.format(sim.multipliers))
-    runs = []
-    for i in range(num_sims):
-      num_rounds = 1
-      num_dice = 142
-      while num_dice < 325:
-        print(f"Round {num_rounds}: Starting with {num_dice} dice")
-        result = simulate_single_run(board, sim.multipliers, num_dice, 20_000)
-        # Subtract number of dice used and add number of free dice rolling that was unused
-        num_dice = num_dice - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
-        # Just a sanity check. Shouldn't ever happen really.
-        if num_dice < 0:
-          raise Exception("What the actual heck")
-        # Go to next round
-        num_rounds += 1
-        num_dice += 142
-      print(f"Round {num_rounds}: Ending with {num_dice} dice")
-      runs.append(num_rounds)
-    # Sort runs and get the percentile result
-    runs.sort()
-    index = int(num_sims*percentile)
-    print(f"{percentile*100}% of people will be able to have {325} dice by round {runs[index]}")
