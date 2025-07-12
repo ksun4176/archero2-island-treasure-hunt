@@ -1,7 +1,6 @@
 import random
 from abc import ABC, abstractmethod
 import statistics
-from typing import Dict
 import math
 from enum import Enum
 import pandas
@@ -17,7 +16,8 @@ class Stat(Enum):
   SHOVELS = "Rune Shovels",
   PROMISE = "Promise Shovels",
   OTTA = "Otta Shards",
-  GOLD = "Gold Coins"
+  GOLD = "Gold Coins",
+  TILE = "Tile"
 
 class SimulationDetails:
   """Details about the simulation
@@ -25,6 +25,9 @@ class SimulationDetails:
   def __init__(self, label: str, multipliers: list[int]):
     self.label = label
     self.multipliers = multipliers
+
+  def __repr__(self):
+    return f"{{ Name: {self.label}, Multipliers: {self.multipliers} }}"
 
 class SimResult:
   """Result of a simulation
@@ -349,12 +352,12 @@ def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_roll
   # add current_points but clear out free_dice so it doesn't bleed over
   result.add_points(current_points)
   result.stats[Stat.EXTRA_DICE] = 0
-  current_position = current_tile
+  result.stats[Stat.TILE] = current_tile
 
   while (result.stats[Stat.POINTS] < points_to_meet and (result.stats[Stat.INITIAL_DICE] < num_dice_rolls or result.stats[Stat.EXTRA_DICE] > 0)) :
     # get multiplier then check if it's allowed
     num_turns = num_dice_rolls - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
-    multiplier = multipliers[current_position]
+    multiplier = multipliers[result.stats[Stat.TILE]]
     if (num_turns < 20):
       multiplier = min(1, multiplier)
     elif (num_turns < 30):
@@ -365,13 +368,41 @@ def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_roll
       multiplier = min(5, multiplier)
 
     # roll the dice
-    old_tile = board[current_position]
+    old_tile = board[result.stats[Stat.TILE]]
     roll = old_tile.roll(multiplier, result)
 
     # land on new tile and get the reward
-    current_position = (current_position + roll) % 24
-    tile = board[current_position]
+    result.stats[Stat.TILE] = (result.stats[Stat.TILE] + roll) % 24
+    tile = board[result.stats[Stat.TILE]]
     tile.get_reward(multiplier, result)
+
+  if (result.roll_dice_bp_met < len(result.roll_dice_task_breakpoints) - 1): # We haven't hit every roll dice breakpoint
+    next_dice_bp = result.roll_dice_task_breakpoints[result.roll_dice_bp_met+1]
+    next_dice_bp_reward = result.roll_dice_task_reward[result.roll_dice_bp_met+1]
+    if next_dice_bp - result.stats[Stat.ROLLS_DONE] < next_dice_bp_reward:
+      difference = next_dice_bp - result.stats[Stat.ROLLS_DONE]
+      while (difference > 0 and (result.stats[Stat.INITIAL_DICE] < num_dice_rolls or result.stats[Stat.EXTRA_DICE] > 0)):
+        # get multiplier then check if it's allowed
+        num_turns = num_dice_rolls - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
+        multiplier = multipliers[result.stats[Stat.TILE]]
+        if (num_turns < 20 or difference < 2):
+          multiplier = min(1, multiplier)
+        elif (num_turns < 30 or difference < 3):
+          multiplier = min(2, multiplier)
+        elif (num_turns < 50 or difference < 4):
+          multiplier = min(3, multiplier)
+        elif (num_turns < 100 or difference < 6):
+          multiplier = min(5, multiplier)
+
+        # roll the dice
+        old_tile = board[result.stats[Stat.TILE]]
+        roll = old_tile.roll(multiplier, result)
+
+        # land on new tile and get the reward
+        result.stats[Stat.TILE] = (result.stats[Stat.TILE] + roll) % 24
+        tile = board[result.stats[Stat.TILE]]
+        tile.get_reward(multiplier, result)
+        difference = next_dice_bp - result.stats[Stat.ROLLS_DONE]
   
   return result
 
@@ -387,6 +418,25 @@ def add_round_to_dataset(dataset, stats):
       dataset[s].append(stats[s])
     else:
       dataset[s] = [stats[s]]
+
+def add_stats_to_round(stats1, stats2):
+  """Add up stats across multipler rounds
+  
+  Args:
+      stats1 (dict): simulation stats to add
+      stats2 (dict): simulation stats to add
+  
+  """
+  cum_stats = {}
+  for stat in Stat:
+    num1 = stats1[stat] if stat in stats1 else 0
+    num2 = stats2[stat] if stat in stats2 else 0
+    if stat == Stat.TILE:
+      cum_stats[stat] = num2
+      continue
+    cum_stats[stat] = num1 + num2
+  return cum_stats
+    
 
 def simulation(sim_details: list[SimulationDetails], board: list[Tile], num_rounds: int, num_dices: list[int], points_to_meet: int, csv: bool = False):
   """Run simulations to get the average PPID using a specified number of starting dice. A single run will only end after all starting dice and free dice received in the run are used.
@@ -469,3 +519,39 @@ def calculate_success_rate(goal_points: int, num_dice: int, current_points: int 
       num_success += 1
   success_rate = (num_runs - 1 if num_success == num_runs else num_success) / num_runs * 100
   print(f'Success rate: {success_rate}%')
+
+def simulation_tiers(tiers: dict[int, SimulationDetails], board: list[Tile], num_rounds: int, num_dice: int, verbose: bool):
+  points_to_meet_list = list(tiers.keys())
+  points_to_meet_list.sort()
+  print(f"Simulation of {num_rounds:,} players starting with {num_dice:,} dice each trying to reach {points_to_meet_list[-1]:,} points:")
+  print(f"This will be done in steps where we will aim for an intermediate goal then pivot to another strategy. The steps and respective multipliers are: {tiers}")
+  dataset = {}
+  for i in range(num_rounds):
+    if verbose:
+      print(f"Round #{i+1:,}")
+    for j in range(len(points_to_meet_list)):
+      points_to_meet = points_to_meet_list[j]
+      sim_details = tiers[points_to_meet]
+      if verbose:
+        print(f"Going for {points_to_meet:,} points using multipliers {sim_details.multipliers}")
+      dice = num_dice
+      current_points = 0
+      dice_used = 0
+      current_tile = 0
+      result = simulate_single_run(board, sim_details.multipliers, dice + dice_used, points_to_meet, current_points, dice_used, current_tile)
+      # Left over dice is original amount - number of dice used + number of free dice rolling that was unused
+      dice = num_dice - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
+      if dice == 0: # No more dice, quit early
+        break
+      # Rest of state
+      current_points = result.stats[Stat.POINTS]
+      dice_used = result.stats[Stat.ROLLS_DONE]
+      current_tile = result.stats[Stat.TILE]
+      if verbose:
+        print(f"Got to {current_points:,} with {dice:,} left")
+      if (j == len(points_to_meet_list)-1):
+        add_round_to_dataset(dataset, result.stats)
+    if (i % 10000 == 9999):
+        print(f"{i+1:,} sims done")
+  df = pandas.DataFrame(dataset)
+  output_stats(df)
