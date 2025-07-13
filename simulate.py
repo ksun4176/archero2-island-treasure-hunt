@@ -330,7 +330,7 @@ def output_stats(df: pandas.DataFrame):
   print(f"PPR: {avg_stats[Stat.POINTS] / avg_stats[Stat.ROLLS_DONE]}")
   print(avg_stats)
 
-def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_rolls: int, points_to_meet: int, prev_run: SimResult = None):
+def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_rolls: int, points_to_meet: int, prev_run: SimResult = None, skip_next_bp: bool = False):
   """Simulate going around the board starting with a specified number of dice rolls
 
   Args:
@@ -366,7 +366,7 @@ def simulate_single_run(board: list[Tile], multipliers: list[int], num_dice_roll
     tile = board[result.stats[Stat.TILE]]
     tile.get_reward(multiplier, result)
 
-  if (result.roll_dice_bp_met < len(result.roll_dice_task_breakpoints) - 1): # We haven't hit every roll dice breakpoint
+  if (not skip_next_bp and result.roll_dice_bp_met < len(result.roll_dice_task_breakpoints) - 1): # We haven't hit every roll dice breakpoint
     next_dice_bp = result.roll_dice_task_breakpoints[result.roll_dice_bp_met+1]
     next_dice_bp_reward = result.roll_dice_task_reward[result.roll_dice_bp_met+1]
     if next_dice_bp - result.stats[Stat.ROLLS_DONE] < next_dice_bp_reward:
@@ -535,7 +535,7 @@ def simulation_tiers(tiers: dict[int, SimulationDetails], board: list[Tile], num
       if verbose:
         print(f"Going for {points_to_meet:,} points using multipliers {sim_details.multipliers}")
         print(f"At {result.stats[Stat.POINTS]} points. Already rolled {result.stats[Stat.ROLLS_DONE]} times. Used {result.stats[Stat.INITIAL_DICE]} dice.")
-      result = simulate_single_run(board, sim_details.multipliers, num_dice, points_to_meet, prev_run=result)
+      result = simulate_single_run(board, sim_details.multipliers, num_dice, points_to_meet, prev_run=result, skip_next_bp=(j < len(points_to_meet_list-1)))
       # Left over dice is original amount - number of dice used + number of free dice rolling that was unused
       dice = num_dice - result.stats[Stat.INITIAL_DICE] + result.stats[Stat.EXTRA_DICE]
       if dice == 0: # No more dice, quit early
