@@ -1,16 +1,8 @@
-'use client';
-import MultiplierMapContent from '@/components/MultiplierMapContent';
-import WhereAreDiceContent from '@/components/WhereAreDiceContent';
-import ShouldRollContent from '@/components/ShouldRollContent';
-import PpidCalcContent from '@/components/PpidCalculatorContent';
-import TipsForNewContent from '@/components/TipsForNewContent';
 import FaqContent from '@/components/FaqContent';
-import { IconButton } from '@mui/material';
-import Drawer from '@mui/material/Drawer';
-import MenuIcon from '@mui/icons-material/Menu';
-import Image from 'next/image';
-import { JSX, useState } from 'react';
+import TipsForNewContent from '@/components/TipsForNewContent';
 import { basePath } from '@/utils/constants';
+import Image from 'next/image';
+import { JSX } from 'react';
 
 type Section = {
   href: string;
