@@ -175,7 +175,7 @@ export default function Home() {
               href='https://ksun4176.github.io/archero2-dice-companion/'
               target='_blank'
               rel='noopener noreferrer'
-              className='text-blue-600 dark:text-blue-400 underline'
+              className='text-blue-600 dark:text-blue-300 underline'
             >
               Archero2 Dice Companion with Guide
             </a>{' '}
